@@ -3,22 +3,14 @@ const app = express()
 
 const host = "127.0.0.1"
 const port = 3000
-const http = require('http')
-const fs = require('fs')
+const path = require('path')
 
-const server = http.createServer((req, res) => {
-    res.writeHead(200, {'Content-Type': 'text/html'})
-    fs.readFile('public/index.html', (err, data) => {
-        if(err) {
-            res.writeHead(404)
-            res.write('Error 404: No resources found')
-        } else {
-            res.write(data)
-        }
-        res.end()
-    })
+app.use(express.static('public'))
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'))
 })
 
-server.listen(port, host, () => {
-    console.log('Servidor en http://',host,':',port)
-});
+app.listen(port, '0.0.0.0', () => {
+    console.log('Servidor en http://', host, ':', port)
+})
