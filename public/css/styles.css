@@ -209,3 +209,22 @@ header {
     border: #000000 2px solid;
     border-radius: 10px;
 }
+
+.form-control {
+    display: block;
+    margin: 0 auto;
+    width: 20%;
+}
+
+.formulario {
+    margin-top: 40px;
+    border: #000000 2px solid;
+}
+
+form > h1 {
+    margin-top:40px;
+}
+
+small {
+    font-size: 10px;
+}

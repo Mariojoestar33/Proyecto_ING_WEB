@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <title>Rincon Paramo</title>
+        <link rel="icon" href="images/favicon.png">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="css/styles.css">
+    </head>
+    <body>
+        <!--Navbar start-->
+        <header>
+            <div class="div-navbar">
+                <nav class="navbar">
+                    <ul class="menu-horizontal">
+                        <li><a href="index.html"><img src="images/favicon.png">Rincon Paramo</a></li>
+                        <li><a href="conocenos.html">Conocenos</a></li>
+                        <li>
+                            <a href="#">Catalogo</a>
+                            <ul class="menu-vertical">
+                                <li><a href="hombre.html">Hombre</a></li>
+                                <li><a href="mujer.html">Mujer</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="crochet.html">Crochet</a></li>
+                        <li><a href="productos.html">Papeleria</a></li>
+                        <li><a href="login.html">Login</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+        <!--End of Navbar-->
+        <!--Creacion de cuenta-->
+        <form>
+            <h1>Creacion de cuenta</h1>
+            <div class="formulario">
+                <label>Correo electronico</label>
+                <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Ingrese su correo electronico">
+                <small id="emailHelp" class="form-text text-muted">Nunca compartiremos su correo electronico con nadie mas.</small>
+                </br>
+                <label>Contraseña</label>
+                <input type="password" class="form-control" id="contraseña1" placeholder="Ingrese su contraseña">
+                <ul id="parametros">
+
+                </ul>
+                <label>Confirmar contraseña</label>
+                <input type="password" class="form-control" id="contraseña2" placeholder="Ingrese su contraseña">
+                <label id="coincidencia"></label>
+                <label>Nombre</label>
+                <input type="text" class="form-control" id="nombre" placeholder="Ingrese su nombre">
+                <label>Apellido</label>
+                <input type="text" class="form-control" id="apellido" placeholder="Ingrese su apellido">
+                <label>Direccion</label>
+                <input type="text" class="form-control" id="direccion" placeholder="Ingrese su direccion">
+                <label>Telefono</label>
+                <input type="text" class="form-control" id="telefono" placeholder="Ingrese su telefono">
+            </div>
+            <input class="btn btn-primary" type="submit" value="Submit" id="boton">
+        </form>
+        <!--End of form-->
+        <!--Footer start-->
+        <footer class="footer">
+            <div class="columnas">
+                <span>Contactanos</span>
+                <ul class="lista-footer">
+                    <li><a href="https://www.facebook.com/"><img src="images/icono_facebook.png" alt="facebook"></a></li>
+                    <li><a href="https://www.instagram.com/rinconparamo_bz/?ref=en.thebell.io"><img src="images/icono_instagram.png" alt="instagram"></a></li>
+                    <li><a href="https://wa.me/5583614589"><img src="images/icono_correo.png" alt="whatsapp"></a></li>
+            </div>
+            <div class="div-terminos">
+                <span>Todos los derechos reservados © 2023</span>
+            </div>
+        </footer>
+    </body>
+</html>
