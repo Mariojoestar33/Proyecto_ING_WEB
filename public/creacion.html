@@ -1,11 +1,18 @@
 <!DOCTYPE html>
 <html lang="es">
     <head>
-        <title>Rincon Paramo</title>
+        <title>Rincon Paramo / Registro</title>
         <link rel="icon" href="images/favicon.png">
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="css/styles.css">
+        <!--Insercion de bibliotecas para fuentes de Google-->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+        <!--Insercion de bibliotecas para Bootstrap 5-->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
     </head>
     <body>
         <!--Navbar start-->
@@ -31,31 +38,24 @@
         </header>
         <!--End of Navbar-->
         <!--Creacion de cuenta-->
-        <form>
-            <h1>Creacion de cuenta</h1>
-            <div class="formulario">
-                <label>Correo electronico</label>
-                <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Ingrese su correo electronico">
-                <small id="emailHelp" class="form-text text-muted">Nunca compartiremos su correo electronico con nadie mas.</small>
-                </br>
-                <label>Contraseña</label>
-                <input type="password" class="form-control" id="contraseña1" placeholder="Ingrese su contraseña">
-                <ul id="parametros">
-
-                </ul>
-                <label>Confirmar contraseña</label>
-                <input type="password" class="form-control" id="contraseña2" placeholder="Ingrese su contraseña">
-                <label id="coincidencia"></label>
-                <label>Nombre</label>
-                <input type="text" class="form-control" id="nombre" placeholder="Ingrese su nombre">
-                <label>Apellido</label>
-                <input type="text" class="form-control" id="apellido" placeholder="Ingrese su apellido">
-                <label>Direccion</label>
-                <input type="text" class="form-control" id="direccion" placeholder="Ingrese su direccion">
-                <label>Telefono</label>
-                <input type="text" class="form-control" id="telefono" placeholder="Ingrese su telefono">
+        <h1 class="titulo">Registro</h1>
+        <form class="formulario">
+            <div class="form-group">
+              <label for="exampleInputEmail1">Correo Electronico</label>
+              <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="example@gmail.com">
+              <small id="emailHelp" class="form-text text-muted"><center>Nunca compartiremos tus datos personales con nadie</center></small>
             </div>
-            <input class="btn btn-primary" type="submit" value="Submit" id="boton">
+            <div class="form-group">
+              <label for="exampleInputPassword1">Password</label>
+              <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">Confirmar Password</label>
+                <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+            </div>
+        </br>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <p><a class="link-opacity-75" href="login.html">Ya tienes una cuenta?</a></p>
         </form>
         <!--End of form-->
         <!--Footer start-->

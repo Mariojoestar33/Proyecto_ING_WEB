@@ -22,7 +22,7 @@ const db = mysql.createConnection( {
 db.connect( (err) => {
     if(err) {
         console.error('Error de conexion: ' + err.message)
-    }
+    } else
     console.log('¡¡Conexion exitosa!!')
 })
 
