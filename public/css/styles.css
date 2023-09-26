@@ -11,7 +11,6 @@ body {
 
 .agrupar {
     width: auto;
-    margin: 25px;
     min-width: 600px;
 }
 
@@ -29,6 +28,10 @@ header {
     justify-content: center;
     align-items: center;
     border-top: #000000 1px solid;
+}
+
+.div-navbar {
+    margin-top:25px;
 }
 
 .menu-horizontal {
