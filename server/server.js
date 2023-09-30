@@ -3,11 +3,12 @@ const express = require('express')
 //const mysql = require('mysql')
 const app = express()
 
-app.use(express.static('public')) //Asignacion de ruta de hojas estaticas
+//app.use(express.static('public')) //Asignacion de ruta de hojas estaticas
 
 //Ruta de la pagina principal
-app.get('/', (req, res) => {
-    res.sendFile(__dirname, 'public', 'index.html')
+app.get('/api', (req, res) => {
+    res.json({ "users": ["userOne", "userTwo", "userThree"] })
+    //res.sendFile(__dirname, 'public', 'index.html')
 })
 
 //Conexion y creacion de la base de datos
