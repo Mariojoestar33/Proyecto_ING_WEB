@@ -1,6 +1,6 @@
 //Creacion de variables de aplicacion y dependencias
 const express = require('express')
-const mysql = require('mysql')
+//const mysql = require('mysql')
 const app = express()
 
 app.use(express.static('public')) //Asignacion de ruta de hojas estaticas
@@ -12,7 +12,7 @@ app.get('/', (req, res) => {
 
 //Conexion y creacion de la base de datos
 
-const db = mysql.createConnection( {
+/*const db = mysql.createConnection( {
     host: 'localhost',
     user: 'root',
     password: '',
@@ -24,10 +24,10 @@ db.connect( (err) => {
         console.error('Error de conexion: ' + err.message)
     } else
     console.log('¡¡Conexion exitosa!!')
-})
+})*/
 
 //Chequeo del estado del servidor
 
 app.listen(3000, () => {
-    console.log('Servidor iniciado en el puerto 3000')
+    console.log('Servidor corriendo en el puerto 3000!!!')
 })
