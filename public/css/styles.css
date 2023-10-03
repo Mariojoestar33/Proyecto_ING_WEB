@@ -1,0 +1,247 @@
+* {
+    font-family: 'Roboto', sans-serif;
+    padding: 0px;
+    margin: 0px;
+    box-sizing: border-box;
+}
+
+body {
+    text-align: center;
+}
+
+.agrupar {
+    width: auto;
+    min-width: 600px;
+}
+
+/*Start of Navbar styles*/
+
+header {
+    display: flex;
+    justify-content: center;
+}
+
+.navbar {
+    width: 100%;
+	max-width: 900px;
+	font-size: 20px;
+    justify-content: center;
+    align-items: center;
+    border-top: #000000 1px solid;
+}
+
+.div-navbar {
+    margin-top:25px;
+}
+
+.menu-horizontal {
+	list-style: none;
+	display: flex;
+    align-items: center;
+    gap: 5px;
+    justify-content: center;
+}
+
+.menu-horizontal > li > a {
+	padding: 1em;
+	color: #000000;
+	text-decoration: none;
+}
+
+.menu-horizontal > li:hover {
+	background-color: rgb(218, 214, 214);
+}
+
+.menu-vertical {
+    display: none;
+    padding-left: 25px;
+    padding-right: 22.5px;
+	list-style: none;
+    margin: 0;
+	background-color: rgb(218, 214, 214);
+}
+
+.menu-horizontal li:hover .menu-vertical {
+	display: block;
+    position: absolute;
+}
+
+.menu-vertical li:hover {
+	background-color: rgb(189, 183, 183);
+}
+
+.menu-vertical li a {
+	display: block;
+	color: #000000;
+	text-decoration: none;
+}
+
+/*End of Navbar styles*/
+
+.titulo {
+    font-size: 45px;
+    text-align: center;
+    color: #000000;
+    margin: auto;
+}
+
+.div-carrousel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.carrousel {
+   /* width: 90%;*/
+   width: 95%;
+   max-width: 120em;
+   overflow-x: hidden;
+}
+
+.slider-box {
+    width: 200%;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    transition: all .5s ease;
+    transform: translateX(0%);
+}
+
+.imagen {
+    width: calc(100%/2);
+}
+
+.puntos {
+    width: 100%;
+    padding: 1em;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+}
+
+.punto {
+    width: 1em;
+    height: 1em;
+    margin: 5px;
+    border-radius: 50%;
+    border: #000000 1px solid;
+    background-color: #ffffff;
+}
+
+.punto.active {
+    background-color: rgb(0, 0, 0);
+}
+
+/*End of Carrousel*/
+
+.div-compromiso {
+    padding: auto;
+}
+
+.div-compromiso > h2 {
+    font-size: 35px;
+    text-align: center;
+    color: #000000;
+}
+
+.compromiso {
+    display: flex;
+    justify-content: space-between;
+}
+
+.columna-envios {
+    width: 100%;
+    padding: 1em;
+    text-align: center;
+}
+
+.columna-envios > h3 {
+    font-size: 25px;
+    text-align: center;;
+    color: #000000;
+}
+
+/*End of Compromisos*/
+
+.div-instagram {
+    margin-bottom: 50px;
+}
+
+.contenedor-instagram {
+    display: flex;
+    justify-content: center;
+    height: 380px;
+}
+
+.frame-instagram {
+    border: #000000 2px solid;
+    border-radius: 50px;
+    box-shadow: #000000 5px 5px;
+}
+
+/*End of instagram*/
+
+.columnas {
+    text-align: center;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.lista-footer {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 5em;
+}
+
+.div-terminos {
+    text-align: center;
+    font-size: small;
+    background-color: rgb(237, 243, 243);
+}
+
+.div-boot {
+    margin-top: 35px;
+    margin-bottom: 20px;
+    margin-left: 50px;
+    margin-right: 50px;
+    border: #000000 2px solid;
+    border-radius: 10px;
+}
+
+.form-control {
+    display: block;
+    margin: 0 auto;
+    width: 20%;
+}
+
+form > h1 {
+    margin-top:40px;
+}
+
+small {
+    font-size: 10px;
+}
+
+.formulario {
+    margin: 0 auto;
+    width: 400px;
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+.formulario > button {
+    display: flex;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.formulario > p {
+    margin: 0 auto;
+    margin-top: 14px;
+    text-align: center;
+}

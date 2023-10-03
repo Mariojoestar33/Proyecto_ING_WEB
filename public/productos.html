@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda de Ropa</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <h1>Tienda de Ropa</h1>
+
+    <!-- Filtros -->
+    <label for="tipo">Tipo:</label>
+    <select id="tipo">
+        <option value="camisas">Camisas</option>
+        <option value="pantalones">Pantalones</option>
+        <option value="vestidos">Vestidos</option>
+    </select>
+
+    <label for="talla">Talla:</label>
+    <select id="talla">
+        <option value="s">S</option>
+        <option value="m">M</option>
+        <option value="l">L</option>
+        <!-- Agrega más opciones de talla aquí -->
+    </select>
+
+    <!-- Lista de Productos -->
+    <div id="productos">
+        <!-- Aquí se cargarán los productos filtrados -->
+    </div>
+
+    <script src="js/logica.js"></script>
+</body>
+</html>
