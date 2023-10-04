@@ -15,7 +15,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => {
   res.render('index', {
     pageTitle: 'Rincon Paramo',
-    currentYear: new Date().getFullYear(),
   });
 });
 
@@ -23,7 +22,6 @@ app.get('/', (req, res) => {
 app.get('/login', (req, res) => {
   res.render('login', {
     pageTitle: 'Iniciar Sesión',
-    currentYear: new Date().getFullYear(),
   });
 });
 
@@ -31,7 +29,6 @@ app.get('/login', (req, res) => {
 app.get('/creacion', (req, res) => {
   res.render('creacion', {
     pageTitle: 'Crear Cuenta',
-    currentYear: new Date().getFullYear(),
   });
 });
 
