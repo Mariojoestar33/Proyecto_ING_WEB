@@ -18,24 +18,7 @@
         <body>
             <!--Navbar start-->
             <header>
-                <div class="div-navbar">
-                    <nav class="navbar">
-                        <ul class="menu-horizontal">
-                            <li><a href="index.html"><img src="images/favicon.png">Rincon Paramo</a></li>
-                            <li><a href="conocenos.html">Conocenos</a></li>
-                            <!--<li>
-                                <a href="#">Catalogo</a>
-                                <ul class="menu-vertical">
-                                    <li><a href="hombre.html">Hombre</a></li>
-                                    <li><a href="mujer.html">Mujer</a></li>
-                                </ul>
-                            </li>-->
-                            <li><a href="crochet.html">Crochet</a></li>
-                            <li><a href="productos.html">Papeleria</a></li>
-                            <li><a href="login.html">Login</a></li>
-                        </ul>
-                    </nav>
-                </div>
+              <%- include('navbar', { pageTitle: 'Rincon Paramo'}) %>
             </header>
             <!--End of Navbar-->
             <div class="div-boot">
@@ -103,18 +86,7 @@
                 </div>
             </div>
             <!--End of Instagram feed-->
-            <footer class="footer">
-                <div class="columnas">
-                    <span>Contactanos</span>
-                    <ul class="lista-footer">
-                        <li><a href="https://www.facebook.com/"><img src="images/icono_facebook.png" alt="facebook"></a></li>
-                        <li><a href="https://www.instagram.com/rinconparamo_bz/?ref=en.thebell.io"><img src="images/icono_instagram.png" alt="instagram"></a></li>
-                        <li><a href="https://wa.me/5583614589"><img src="images/icono_correo.png" alt="whatsapp"></a></li>
-                </div>
-                <div class="div-terminos">
-                    <span>Todos los derechos reservados © 2023</span>
-                </div>
-            </footer>
+            <%- include('footer', { currentYear: new Date().getFullYear() }) %>
         </body>
     </div>
 </html>
