@@ -1,35 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tienda de Ropa</title>
-    <link rel="stylesheet" href="css/styles.css">
-</head>
-<body>
-    <h1>Tienda de Ropa</h1>
-
-    <!-- Filtros -->
-    <label for="tipo">Tipo:</label>
-    <select id="tipo">
-        <option value="camisas">Camisas</option>
-        <option value="pantalones">Pantalones</option>
-        <option value="vestidos">Vestidos</option>
-    </select>
-
-    <label for="talla">Talla:</label>
-    <select id="talla">
-        <option value="s">S</option>
-        <option value="m">M</option>
-        <option value="l">L</option>
-        <!-- Agrega más opciones de talla aquí -->
-    </select>
-
-    <!-- Lista de Productos -->
-    <div id="productos">
-        <!-- Aquí se cargarán los productos filtrados -->
+<html lang="es">
+    <%- include('head') %>
+    <body>
+        <header>
+            <%- include('navbar') %>
+        </header>
+    <div class="container">
+        <h1 class="titulo">Listado de Productos</h1>
+        <div class="row">
+            <% products.forEach((product) => { %>
+                <div class="col-md-4 mb-4">
+                    <div class="card" style="width: 18rem;">
+                        <!-- Puedes usar product.imagen_path para la ruta de la imagen -->
+                        <img src="<%=product.imagen%>" class="card-img-top" alt="Imagen del producto">
+                        <div class="card-body">
+                            <h5 class="card-title"><%= product.nombre %></h5>
+                            <!--<p class="card-text"><%= product.descripcion %></p>-->
+                            <p class="card-text">Categoría: <%= product.categoria %></p>
+                            <p class="card-text">Stock: <%= product.stock %></p>
+                            <p class="card-text">Precio: <%= product.precio %></p>
+                            <!-- Agrega aquí cualquier otra información que desees mostrar -->
+                            <a href="#" class="btn btn-primary">Ver detalles</a>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
     </div>
+    
 
-    <script src="js/logica.js"></script>
-</body>
+        <%- include('footer', { currentYear: new Date().getFullYear() }) %>
+    </body>
 </html>
