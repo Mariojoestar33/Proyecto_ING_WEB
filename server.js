@@ -19,8 +19,8 @@ connection.connect((err) => { //Funcion de coneccion a la base de datos
     console.error('Error de conexión a la base de datos:', err)
     return
   }
-  console.log('Conexión a la base de datos MySQL establecida.')
-});
+  console.log('Conexión a la base de datos MySQL establecida...')
+})
 
 module.exports = connection
 //Fin de bd
@@ -73,5 +73,5 @@ app.get('/productos', (req, res) => {
 
 // Iniciar el servidor en el puerto 3000
 app.listen(3000, () => {
-  console.log('Servidor en ejecución en el puerto 3000')
+  console.log('Servidor en ejecución en el puerto 3000!!!')
 })
