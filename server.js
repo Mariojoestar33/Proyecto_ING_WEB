@@ -57,7 +57,7 @@ app.get('/creacion', (req, res) => {
 
 //Ruta para los productos
 app.get('/productos', (req, res) => {
-  const sql = 'SELECT id, nombre, categoria, stock, descripcion FROM productos';
+  const sql = 'SELECT * FROM productos';
   connection.query(sql, (err, results) => {
     if (err) {
       console.error('Error al recuperar los productos:', err)

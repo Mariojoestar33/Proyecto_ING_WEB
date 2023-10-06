@@ -2,25 +2,28 @@
 <html lang="es">
     <%- include('head') %>
     <body>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="js/filtro.js"></script>
         <header>
             <%- include('navbar') %>
         </header>
         <div class="container">
-            <h1 class="titulo">Listado de Productos</h1>
+            <h1 class="titulo">Productos</h1>
+            <br>
             <div class="row">
                 <% products.forEach((product) => { %>
                     <div class="col-md-4 mb-4">
                         <div class="card" style="width: 18rem;">
                             <!-- Puedes usar product.imagen_path para la ruta de la imagen -->
-                            <img src=<%= product.imagen%> class="card-img-top" alt="Imagen del producto">
+                            <img src="<%= product.imagen %>" class="card-img-top" alt="Imagen del producto">
                             <div class="card-body">
-                                <h5 class="card-title"><%= product.nombre %></h5>
+                                <h5 class="card-title" style="text-align: center;"><%= product.nombre %></h5>
                                 <!--<p class="card-text"><%= product.descripcion %></p>-->
-                                <p class="card-text">Categoría: <%= product.categoria %></p>
-                                <p class="card-text">Stock: <%= product.stock %></p>
-                                <p class="card-text">Precio: <%= product.imagen %></p>
+                                <p class="card-text" style="text-align: center;">Categoría: <%= product.categoria %></p>
+                                <p class="card-text" style="text-align: center;">Stock: <%= product.stock %></p>
+                                <p class="card-text" style="text-align: center;">Precio: $<%= product.precio %></p>
                                 <!-- Agrega aquí cualquier otra información que desees mostrar -->
-                                <a href="#" class="btn btn-primary">Ver detalles</a>
+                                <a href="#" class="btn btn-primary" style="width: 100%;">$<%= product.precio%></a>
                             </div>
                         </div>
                     </div>
