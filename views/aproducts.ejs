@@ -67,6 +67,29 @@
             </form>
         </div>
     </div>
+    <div id="alerta" class="alert alert-success" style="display: none;">
+        Registro de producto exitoso.
+    </div>
+    <script>
+        // Función para obtener los parámetros de la URL por nombre
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+    
+        // Verifica si hay un parámetro en la URL llamado "registroExitoso"
+        var registroExitoso = getParameterByName('registroExitoso');
+    
+        // Muestra la alerta si el registro fue exitoso
+        if (registroExitoso === 'true') {
+            document.getElementById('alerta').style.display = 'block';
+        }
+    </script>
     <!--Footer start-->
     <%- include('footer', { currentYear: new Date().getFullYear() }) %>
 </body>
