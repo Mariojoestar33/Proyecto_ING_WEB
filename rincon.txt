@@ -1,0 +1,48 @@
+CREATE DATABASE IF NOT EXISTS rincon;
+
+USE rincon;
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(64),
+    apellido VARCHAR(64),
+    correo VARCHAR(64) UNIQUE,
+    tipo_usuario ENUM('administrador', 'editor', 'cliente'),
+    contrasena_hash VARCHAR(255),
+    salt VARCHAR(64)
+);
+
+CREATE TABLE direcciones (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT,
+    calle VARCHAR(64),
+    numero_exterior VARCHAR(10),
+    ciudad VARCHAR(64),
+    cp VARCHAR(10),
+    colonia VARCHAR(64),
+    FOREIGN KEY (id_usuario) REFERENCES users(id)
+);
+
+CREATE TABLE productos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(64),
+    categoria VARCHAR(64),
+    stock INT,
+    descripcion VARCHAR(64)
+);
+
+CREATE TABLE compras (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT,
+    id_producto INT,
+    fecha_compra DATE,
+    cantidad_comprada INT,
+    FOREIGN KEY (id_usuario) REFERENCES users(id),
+    FOREIGN KEY (id_producto) REFERENCES productos(id)
+);
+
+ALTER TABLE productos
+ADD imagen VARCHAR(255),
+ADD precio DECIMAL(10, 2),
+ADD marca VARCHAR(64);
+
