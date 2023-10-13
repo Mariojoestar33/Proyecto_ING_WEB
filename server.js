@@ -1,4 +1,5 @@
 const express = require('express')
+const session = require('express-session')
 const app = express()
 const path = require('path')
 const mysql = require('mysql')
@@ -65,7 +66,7 @@ app.get('/login', (req, res) => {
 })
 
 // Ruta para la página de creación de cuentas (creacion.ejs)
-app.get('/creacion', (req, res) => {
+app.get('/registro', (req, res) => {
     res.render('creacion', {
         pageTitle: 'Crear Cuenta',
     })
