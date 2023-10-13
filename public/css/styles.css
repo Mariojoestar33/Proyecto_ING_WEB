@@ -281,3 +281,27 @@ footer {
     font-size: 12px;
     font-weight: bold;
 }
+
+.imagenproducto {
+    height: 500px;
+    width: 500px;
+    margin: auto;
+}
+
+.producto {
+    display: flex;
+    text-align: center;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.producto > p {
+    font-weight: bold;
+    font-size: 25px;
+}
+
+.producto > button {
+    width: 160px;
+    margin: auto;
+}

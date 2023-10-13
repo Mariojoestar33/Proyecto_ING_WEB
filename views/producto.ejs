@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include('head') %>
+    <body>
+        <header>
+            <%- include('navbar') %>
+        </header>
+        <div class="producto">
+            <h1 class="titulo"><%= product.nombre %></h1>
+            <img class = "imagenproducto" src="../<%= product.imagen %>" alt="<%= product.nombre %>">
+            <p><%= product.descripcion %></p>
+            <p>Stock: <%= product.stock %></p>
+            <button id="agregarAlCarrito" class="btn btn-primary">Agregar al Carrito</button>
+        </div>
+        <%- include('footer', { currentYear: new Date().getFullYear() }) %>
+    </body>
+</html>

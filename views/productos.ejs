@@ -14,12 +14,13 @@
                 <% products.forEach((product) => { %>
                     <div class="col-md-4 mb-4">
                         <div class="card" style="width: 18rem;">
+                            
                             <img src="<%= product.imagen %>" class="card-img-top" alt="Imagen del producto">
                             <div class="card-body">
                                 <h5 class="card-title" style="text-align: center;"><%= product.nombre %></h5>
                                 <p class="card-text" style="text-align: center;">Categoría: <%= product.categoria %></p>
                                 <p class="card-text" style="text-align: center;">Stock: <%= product.stock %></p>
-                                <a href="#" class="btn btn-primary" style="width: 100%;">$<%= product.precio%></a>
+                                <a href="/productos/<%= product.id %>" class="btn btn-primary" style="width: 100%;">$<%= product.precio%></a>
                             </div>
                         </div>
                     </div>

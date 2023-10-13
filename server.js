@@ -174,6 +174,30 @@ app.post('/productos/agregar', upload.single('imagen'), (req, res) => {
     }
 })
 
+//Paginas individuales de productos
+// Página de detalles del producto
+app.get('/productos/:productoId', (req, res) => {
+    const productoId = req.params.productoId
+    // Consulta la base de datos para obtener la información del producto con el ID proporcionado
+    connection.query('SELECT * FROM productos WHERE id = ?', [productoId], (err, results) => {
+        if (err) {
+            console.error('Error al recuperar los detalles del producto:', err)
+            res.status(500).send('Error interno del servidor')
+            return
+        }
+        if (results.length === 0) {
+            res.status(404).send('Producto no encontrado')
+            return
+        }
+        const product = results[0]
+        res.render('producto', {
+            pageTitle: product.nombre,
+            product,
+            user: req.user, // Pasa la información del usuario a la plantilla
+        })
+    })
+})
+
 // Iniciar el servidor en el puerto 3000
 app.listen(3000, () => {
     console.log('Servidor en ejecución en el puerto 3000!!!')
