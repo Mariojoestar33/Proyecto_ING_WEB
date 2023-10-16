@@ -28,6 +28,9 @@ CREATE TABLE productos (
     nombre VARCHAR(64),
     categoria VARCHAR(64),
     stock INT,
+    imagen VARCHAR(255),
+    precio DECIMAL(10, 2),
+    marca VARCHAR(64),
     descripcion VARCHAR(64)
 );
 
@@ -40,9 +43,4 @@ CREATE TABLE compras (
     FOREIGN KEY (id_usuario) REFERENCES users(id),
     FOREIGN KEY (id_producto) REFERENCES productos(id)
 );
-
-ALTER TABLE productos
-ADD imagen VARCHAR(255),
-ADD precio DECIMAL(10, 2),
-ADD marca VARCHAR(64);
 
