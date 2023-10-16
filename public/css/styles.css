@@ -305,3 +305,49 @@ footer {
     width: 160px;
     margin: auto;
 }
+
+.conocenos {
+    margin: 100px;
+    display: grid;
+    grid-template-columns: 500px auto;
+}
+
+.subcontainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.subcontainer > h3 {
+    transform: scale(1);
+    transition: all 0.5s ease-in-out;
+}
+
+.subcontainer > h3:hover {
+    transform: scale(1.5);
+    transition: all 0.5s ease-in-out;
+}
+
+.subcontainer > ul > li {
+    transform: scale(1);
+    transition: all 0.5s ease-in-out;
+}
+
+.subcontainer > ul > li:hover {
+    transform: scale(1.5);
+    transition: all 0.5s ease-in-out;
+}
+
+.subcontainer > img {
+    width: 800px;
+    border-radius: 20px;
+    transform: scale(1);
+    transition: all 0.5s ease-in-out;
+}
+
+.subcontainer > img:hover {
+    transform: scale(1.1);
+    transition: all 0.5s ease-in-out;
+}

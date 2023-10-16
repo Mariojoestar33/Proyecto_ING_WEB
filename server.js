@@ -58,6 +58,13 @@ app.get('/', (req, res) => {
     })
 })
 
+//Ruta pagina conocenos
+app.get('/conocenos', (req, res) => {
+    res.render('conocenos', {
+        pageTitle: 'Sobre nosotros',
+    })
+})
+
 // Ruta para la página de inicio de sesión (login.ejs)
 app.get('/login', (req, res) => {
     res.render('login', {
