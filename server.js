@@ -1,11 +1,11 @@
 const express = require('express')
 const session = require('express-session')
-const app = express()
 const path = require('path')
 const mysql = require('mysql')
 const multer = require('multer')
 const sharp = require('sharp')
 const fs = require('fs')
+const app = express()
 
 // Base de datos configuración y acceso
 const dbConfig = {
@@ -13,7 +13,7 @@ const dbConfig = {
     user: 'root',
     password: '',
     database: 'rincon'
-};
+}
 
 const connection = mysql.createConnection(dbConfig)
 
