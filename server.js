@@ -1,11 +1,17 @@
 const express = require('express')
-const session = require('express-session')
+const expressSession = require('express-session')
 const path = require('path')
 const mysql = require('mysql')
 const multer = require('multer')
 const sharp = require('sharp')
 const fs = require('fs')
 const app = express()
+
+app.use(expressSession({
+    secret: 'secreto', // Cambia esto por una clave segura
+    resave: false,
+    saveUninitialized: true
+}))
 
 // Base de datos configuración y acceso
 const dbConfig = {
@@ -65,6 +71,18 @@ app.get('/conocenos', (req, res) => {
     })
 })
 
+//Ruta para perfil
+app.get('/perfil', (req, res) => {
+    if(req.session.usuario) { //En caso de que se encuentre la sesion, manda al perfil de la persona
+        res.render('perfil', {
+            pageTitle: 'Mi perfil',
+            usuario: req.session.usuario
+        })
+    } else { //En caso de que no se haya iniciado sesion se redirecciona a la pagina de login
+        res.redirect('/login')
+    }
+})
+
 // Ruta para la página de inicio de sesión (login.ejs)
 app.get('/login', (req, res) => {
     res.render('login', {
@@ -76,6 +94,38 @@ app.get('/login', (req, res) => {
 app.get('/registro', (req, res) => {
     res.render('creacion', {
         pageTitle: 'Crear Cuenta',
+    })
+})
+
+//Agregar usuario (registro)
+app.post('/registrar', (req, res) => {
+    const { nombre, correo, contrasena, confirmar_contrasena } = req.body;
+
+    // Validación de datos (puedes agregar más validaciones según tus necesidades)
+
+    if (!nombre || !correo || !contrasena || !confirmar_contrasena) {
+        return res.status(400).send('Todos los campos son obligatorios.');
+    }
+
+    if (contrasena !== confirmar_contrasena) {
+        return res.status(400).send('Las contraseñas no coinciden.');
+    }
+
+    // Hashear la contraseña antes de almacenarla en la base de datos
+    bcrypt.hash(contrasena, 10, (err, hashedPassword) => {
+        if (err) {
+            console.error('Error al hashear la contraseña:', err);
+            return res.status(500).send('Error interno del servidor');
+        }
+
+        const sql = 'INSERT INTO users (nombre, correo, contrasena_hash) VALUES (?, ?, ?)';
+        connection.query(sql, [nombre, correo, hashedPassword], (err, result) => {
+            if (err) {
+                console.error('Error al registrar usuario:', err)
+                return res.status(500).send('Error interno del servidor')
+            }
+            res.redirect('/login') // Redirige al usuario a la página de inicio de sesión después del registro
+        })
     })
 })
 
@@ -199,8 +249,7 @@ app.get('/productos/:productoId', (req, res) => {
         const product = results[0]
         res.render('producto', {
             pageTitle: product.nombre,
-            product,
-            user: req.user, // Pasa la información del usuario a la plantilla
+            product
         })
     })
 })
