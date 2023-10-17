@@ -18,11 +18,42 @@
                 <h3>Nuestros valores</h3>
                 <p>Contamos con distintos valores en la empresa, entre los que se encuentran:</p>
                 <ul>
-                    <li>Honestidad</li>
-                    <li>Compromiso</li>
-                    <li>Dedicacion</li>
+                    <li id="honestidad">Honestidad</li>
+                    <li id="compromiso">Compromiso</li>
+                    <li id="dedicacion">Dedicacion</li>
                 </ul>
             </div>
+            <div class="subcontainer">
+                <img id="imagenValor" src="" alt="">
+            </div>
+            <script>
+                // Obtén referencias a los elementos de la lista y la imagen
+                const listaValores = document.querySelectorAll('li');
+                const imagenValor = document.getElementById('imagenValor');
+
+                // Asigna un manejador de eventos para cada valor de la lista
+                listaValores.forEach(valor => {
+                    valor.addEventListener('click', () => {
+                        // Obtiene el valor del atributo id del elemento seleccionado
+                        const valorSeleccionado = valor.id;
+
+                        // Determina la ruta de la imagen correspondiente
+                        let imagenSrc;
+                        if (valorSeleccionado === 'honestidad') {
+                            imagenSrc = 'images/honestidad.png';
+                        } else if (valorSeleccionado === 'compromiso') {
+                            imagenSrc = 'images/compromiso.png';
+                        } else if (valorSeleccionado === 'dedicacion') {
+                            imagenSrc = 'images/dedicacion.png';
+                        }
+
+                        // Actualiza el src de la imagen con la ruta correspondiente
+                        imagenValor.src = imagenSrc;
+                        imagenValor.style.transform = 'scale(1.5)';
+                        imagenValor.style.transition = 'all 0.5s ease-in-out';
+                    })
+                })
+            </script>
         </div>  
         <%- include('footer', { currentYear: new Date().getFullYear() }) %>
     </body>

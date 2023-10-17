@@ -318,6 +318,7 @@ footer {
     justify-content: center;
     align-items: center;
     text-align: center;
+    gap: 10px;
 }
 
 .subcontainer > h3 {
@@ -330,7 +331,15 @@ footer {
     transition: all 0.5s ease-in-out;
 }
 
+.subcontainer > ul {
+    display: flex;
+    transform: scale(1);
+    transition: all 0.5s ease-in-out;
+}
+
 .subcontainer > ul > li {
+    list-style: none;
+    margin: 25px;
     transform: scale(1);
     transition: all 0.5s ease-in-out;
 }
@@ -349,5 +358,12 @@ footer {
 
 .subcontainer > img:hover {
     transform: scale(1.1);
+    transition: all 0.5s ease-in-out;
+}
+
+#imagenValor {
+    width:100px;
+    border-radius: 20px;
+    transform: scale(0.3);
     transition: all 0.5s ease-in-out;
 }
