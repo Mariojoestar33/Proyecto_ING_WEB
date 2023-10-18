@@ -319,6 +319,7 @@ footer {
     align-items: center;
     text-align: center;
     gap: 10px;
+    user-select: none;
 }
 
 .subcontainer > h3 {
