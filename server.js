@@ -6,12 +6,10 @@ const multer = require('multer')
 const sharp = require('sharp')
 const fs = require('fs')
 const app = express()
+const { createHash } = require('crypto') //Encriptacion
+const bodyParser = require('body-parser') //Para poder leer los datos de formularios
 
-app.use(expressSession({
-    secret: 'secreto', // Cambia esto por una clave segura
-    resave: false,
-    saveUninitialized: true
-}))
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Base de datos configuración y acceso
 const dbConfig = {
@@ -99,34 +97,33 @@ app.get('/registro', (req, res) => {
 
 //Agregar usuario (registro)
 app.post('/registrar', (req, res) => {
-    const { nombre, correo, contrasena, confirmar_contrasena } = req.body;
-
-    // Validación de datos (puedes agregar más validaciones según tus necesidades)
-
-    if (!nombre || !correo || !contrasena || !confirmar_contrasena) {
-        return res.status(400).send('Todos los campos son obligatorios.');
+    const nombre = req.body.nombre
+    const correo = req.body.correo
+    const contrasenia = req.body.contrasenia
+    const confirmar_contrasenia = req.body.confirmar_contrasenia
+    const tipo = "cliente"
+    if (!nombre || !correo || !contrasenia || !confirmar_contrasenia || !tipo) { // Validación de datos (puedes agregar más validaciones según tus necesidades)
+        console.log("nombre", nombre, "correo", correo, "contrasenia", contrasenia, "confirmar_contrasenia", confirmar_contrasenia, "tipo", tipo)
+        return res.status(400).send('Todos los campos son obligatorios.')
     }
-
-    if (contrasena !== confirmar_contrasena) {
-        return res.status(400).send('Las contraseñas no coinciden.');
+    if (contrasenia !== confirmar_contrasenia) {
+        return res.status(400).send('Las contraseñas no coinciden.')
     }
-
-    // Hashear la contraseña antes de almacenarla en la base de datos
-    bcrypt.hash(contrasena, 10, (err, hashedPassword) => {
-        if (err) {
-            console.error('Error al hashear la contraseña:', err);
-            return res.status(500).send('Error interno del servidor');
-        }
-
-        const sql = 'INSERT INTO users (nombre, correo, contrasena_hash) VALUES (?, ?, ?)';
-        connection.query(sql, [nombre, correo, hashedPassword], (err, result) => {
+    try {  //Prueba de encriptacion
+        const hash = createHash('sha256').update(contrasenia).digest('hex')
+        const sql = 'INSERT INTO users (nombre, correo, tipo, contrasenia) VALUES (?, ?, ?, ?)'
+        connection.query(sql, [nombre, correo, tipo, hash], (err, resultado) => { //Uso de "resultado" en lugar de "res" para evvitar colisiones
             if (err) {
                 console.error('Error al registrar usuario:', err)
                 return res.status(500).send('Error interno del servidor')
             }
-            res.redirect('/login') // Redirige al usuario a la página de inicio de sesión después del registro
+            console.log("Usuario registrado exitosamente!!!")
+            return res.redirect("/login") // Redirige al usuario a la página de inicio de sesión después del registro
         })
-    })
+    } catch(err) {
+        console.error('Error al encriptar la contraseña:', err)
+        return res.status(500).send('Error interno del servidor')
+    }
 })
 
 // Ruta para los productos
