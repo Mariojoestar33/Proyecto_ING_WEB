@@ -221,6 +221,8 @@ app.get('/productos', (req, res) => {
 
 // Ruta para agregar productos (GET)
 app.get('/productos/agregar', (req, res) => {
+    res.locals.userRole = userRole //Variable local para tomar el rol del usuario
+    if(req.session.usuario && (req.session.usuario.tipo == "editor" || req.session.usuario.tipo == "administrador")) { //Si el usuario ha iniciado sesion y tiene un rango de este tipo
     // Recupera las categorías existentes desde la base de datos
     const sqlCategorias = 'SELECT DISTINCT categoria FROM productos'
     connection.query(sqlCategorias, (err, categorias) => {
@@ -245,6 +247,9 @@ app.get('/productos/agregar', (req, res) => {
             })
         })
     })
+    } else { //Si el usuario no ha iniciado sesion o no tiene el rango correspondiente
+        res.status(403).send('Acceso denegado')
+    }
 })
 
 // Ruta para agregar productos (POST)

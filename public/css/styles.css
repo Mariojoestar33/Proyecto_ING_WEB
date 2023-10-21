@@ -373,8 +373,31 @@ footer {
     display: grid;
     grid-template-columns: 500px auto;
     margin-top: 40px;
+    margin: 20px;
 }
 
 .lateralmenu {
     list-style: none;
+}
+
+.submenu {
+    display: none;
+    position: absolute;
+}
+
+.submenu > li {
+    list-style: none;
+}
+
+.submenu > li > a {
+    text-decoration: none;
+    color: #000000;
+}
+
+.activadorSub:hover .submenu {
+    display: block;
+}
+
+.container {
+    margin-top: 40px;
 }
