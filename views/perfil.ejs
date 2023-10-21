@@ -1,10 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <%- include('head')%>
     <body>
         <header>
             <%- include('navbar')%>
         </header>
+        <div class="cuerpoPerfil">
+            <div class="menuizquierdo">
+                <ul class="lateralmenu">
+                    <li><a href="/perfil">Informacion personal</a></li>
+                    <li><a href="/perfil/direcciones">Direcciones</a></li>
+                    <li><a href="/perfil/compras">Compras</a></li>
+                    <li><a href="/cerrar">Cerrar sesion</a></li>
+                </ul>
+            </div>
+            <div>
+                <h2>Datos Personales</h2>
+                <form action="/modificarPerfil" method="post" class="datosPerfil">
+                    <label for="nombre">Nombre: </label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" value="<%= user.nombre %>">
+                    <button type="submit" class="btn btn-primary">Cambiar datos</button>
+                </form>
+            </div>
+        </div>
         <%- include('footer', { currentYear: new Date().getFullYear() })%>
     </body>
 </html>

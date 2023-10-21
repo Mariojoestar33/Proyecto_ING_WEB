@@ -368,3 +368,13 @@ footer {
     transform: scale(0.3);
     transition: all 0.5s ease-in-out;
 }
+
+.cuerpoPerfil {
+    display: grid;
+    grid-template-columns: 500px auto;
+    margin-top: 40px;
+}
+
+.lateralmenu {
+    list-style: none;
+}

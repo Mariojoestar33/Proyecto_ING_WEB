@@ -20,7 +20,8 @@ app.use(session({ //Manejo de sesiones
 app.use((req, res, next) => {
     if (req.session.usuario) {
         // Si el usuario ha iniciado sesión, obtén su rol desde la sesión
-        userRole = req.session.usuario.tipo; // Asumiendo que la sesión contiene el rol del usuario
+        userName = req.session.usuario.nombre //Asuminedo que la sesion tiene el nombre del usuario logeado
+        userRole = req.session.usuario.tipo // Asumiendo que la sesión contiene el rol del usuario
     } else {
         // Si no ha iniciado sesión, establece un valor predeterminado (por ejemplo, "invitado")
         userRole = "invitado"
@@ -94,10 +95,13 @@ app.get('/conocenos', (req, res) => {
 
 //Ruta para perfil
 app.get('/perfil', (req, res) => {
-    if(req.session.usuario) { //En caso de que se encuentre la sesion, manda al perfil de la persona
+    res.locals.userRole = userRole
+    if(req.session.usuario) { 
+        const user = req.session.usuario//En caso de que se encuentre la sesion, manda al perfil de la persona
         res.render('perfil', {
             pageTitle: 'Mi perfil',
-            usuario: req.session.usuario
+            user: user
+            //usuario: req.session.usuario
         })
     } else { //En caso de que no se haya iniciado sesion se redirecciona a la pagina de login
         res.redirect('/login')
@@ -127,12 +131,13 @@ app.post('/logear', (req, res) => {
             const usuario = results[0]
             const hashContrasenia = createHash('sha256').update(contrasenia).digest('hex')
 
-
-            console.log("Usuario encontrado:", usuario)
-            console.log("Contraseña proporcionada:", usuario.contrasenia)
+            //console.log("Usuario encontrado:", usuario)
+            //console.log("Contraseña proporcionada:",hashContrasenia)
+            //console.log("Contraseña encontrada en la base de datos", usuario.contrasenia)
             // Comparar la contraseña proporcionada con la almacenada
             if (hashContrasenia === usuario.contrasenia) {
                 // Contraseña válida, crear una sesión para el usuario
+                console.log("Se inicio sesion exitosamente!!!")
                 req.session.usuario = usuario
                 res.redirect('/') // Redirigir a pagina principal del usuario
             } else {
@@ -142,6 +147,18 @@ app.post('/logear', (req, res) => {
         } else {
             console.log('Correo electrónico no encontrado:', correo)
             res.redirect('/login') // Correo electrónico no encontrado
+        }
+    })
+})
+
+//Ruta para la destruccion de la sesion actual
+app.get("/cerrar", (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Error al cerrar la sesión:', err);
+        } else {
+            // Redirige al usuario a una página de inicio de sesión o a la página principal
+            res.redirect('/'); // Cambia '/login' a la ruta que desees
         }
     })
 })
@@ -187,7 +204,7 @@ app.post('/registrar', (req, res) => {
 
 // Ruta para los productos
 app.get('/productos', (req, res) => {
-    res.locals.userRole = userRole; //Variable local para tomar el rol del usuario
+    res.locals.userRole = userRole //Variable local para tomar el rol del usuario
     const sql = 'SELECT * FROM productos'
     connection.query(sql, (err, results) => {
         if (err) {
@@ -289,7 +306,6 @@ app.post('/productos/agregar', upload.single('imagen'), (req, res) => {
     }
 })
 
-//Paginas individuales de productos
 // Página de detalles del producto
 app.get('/productos/:productoId', (req, res) => {
     res.locals.userRole = userRole; //Variable local para tomar el rol del usuario
