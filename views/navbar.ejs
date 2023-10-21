@@ -1,5 +1,5 @@
 <!-- navbar.ejs -->
-<nav class="navbarM">
+<!--<nav class="navbarM">
     <ul class="menu-horizontal">
         <li><a href="/"><image src = "/images/favicon.png"></image>Inicio</a></li>
         <li><a href="/conocenos">Conócenos</a></li>
@@ -7,4 +7,25 @@
         <li><a href="/productos">Papeleria</a></li>
         <li><a href="/login">Login</a></li>
     </ul>
+</nav>-->
+<nav class="navbarM">
+    <ul class="menu-horizontal">
+        <li><a href="/"><image src = "/images/favicon.png"></image>Inicio</a></li>
+        <li><a href="/conocenos">Conócenos</a></li>
+        <% if (userRole == "cliente") { %>
+            <li><a href="/productos">Papeleria</a></li>
+            <li><a href="/perfil"><%= userName %></a></li>
+        <% } else if(userRole == "editor") { %>
+        <li><a href="/productos/agregar">Agregar</a></li>
+        <li><a href="/productos/editar">Editar</a></li>
+        <li><a href="/cerrar">Cerrar Sesion</a></li>
+        <% } else if(userRole == "administrador") { %>
+        <li><a href="/admincontrol">Crear/modificar</a></li>
+        <li><a href="/cerrar">Cerrar Sesion</a></li>
+        <% } else if(userRole == "invitado") { %>
+        <li><a href="/productos">Papeleria</a></li>
+        <li><a href="/login">Login</a></li>
+        <% } %>
+    </ul>
 </nav>
+

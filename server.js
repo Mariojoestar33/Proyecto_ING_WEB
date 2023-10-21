@@ -1,5 +1,5 @@
 const express = require('express')
-const expressSession = require('express-session')
+const session = require('express-session')
 const path = require('path')
 const mysql = require('mysql')
 const multer = require('multer')
@@ -8,6 +8,27 @@ const fs = require('fs')
 const app = express()
 const { createHash } = require('crypto') //Encriptacion
 const bodyParser = require('body-parser') //Para poder leer los datos de formularios
+
+let userRole = null //Variable para el rol del usuario
+
+app.use(session({ //Manejo de sesiones
+    secret: 'secreto', // Clave secreta para firmar la sesión (debería ser una cadena segura)
+    resave: false, // Evita que la sesión se guarde en el almacén en cada solicitud
+    saveUninitialized: false, // Evita que se cree una sesión no inicializada en la solicitud
+}))
+
+app.use((req, res, next) => {
+    if (req.session.usuario) {
+        // Si el usuario ha iniciado sesión, obtén su rol desde la sesión
+        userRole = req.session.usuario.tipo; // Asumiendo que la sesión contiene el rol del usuario
+    } else {
+        // Si no ha iniciado sesión, establece un valor predeterminado (por ejemplo, "invitado")
+        userRole = "invitado"
+    }
+
+    // Continúa con la ejecución del siguiente middleware
+    next()
+})
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -57,6 +78,7 @@ const upload = multer({ storage })
 
 // Ruta para la página de inicio (index.ejs)
 app.get('/', (req, res) => {
+    res.locals.userRole = userRole //Variable local para tomar el rol del usuario
     res.render('index', {
         pageTitle: 'Rincon Paramo',
     })
@@ -64,6 +86,7 @@ app.get('/', (req, res) => {
 
 //Ruta pagina conocenos
 app.get('/conocenos', (req, res) => {
+    res.locals.userRole = userRole; //Variable local para tomar el rol del usuario
     res.render('conocenos', {
         pageTitle: 'Sobre nosotros',
     })
@@ -83,13 +106,49 @@ app.get('/perfil', (req, res) => {
 
 // Ruta para la página de inicio de sesión (login.ejs)
 app.get('/login', (req, res) => {
+    res.locals.userRole = userRole; //Variable local para tomar el rol del usuario
     res.render('login', {
         pageTitle: 'Iniciar Sesión',
     })
 })
 
+// Ruta de inicio de sesión
+app.post('/logear', (req, res) => {
+    const correo = req.body.correo
+    const contrasenia = req.body.contrasenia
+
+    // Buscar el usuario por correo en la base de datos
+    const sql = 'SELECT * FROM users WHERE correo = ?'
+    connection.query(sql, [correo], (err, results) => {
+        if (err) {
+            console.error('Error al consultar la base de datos:', err)
+            res.redirect('/login'); // Manejo de error
+        } else if (results.length === 1) {
+            const usuario = results[0]
+            const hashContrasenia = createHash('sha256').update(contrasenia).digest('hex')
+
+
+            console.log("Usuario encontrado:", usuario)
+            console.log("Contraseña proporcionada:", usuario.contrasenia)
+            // Comparar la contraseña proporcionada con la almacenada
+            if (hashContrasenia === usuario.contrasenia) {
+                // Contraseña válida, crear una sesión para el usuario
+                req.session.usuario = usuario
+                res.redirect('/') // Redirigir a pagina principal del usuario
+            } else {
+                console.log('Contraseña incorrecta:', contrasenia)
+                res.redirect('/login') // Contraseña incorrecta
+            }
+        } else {
+            console.log('Correo electrónico no encontrado:', correo)
+            res.redirect('/login') // Correo electrónico no encontrado
+        }
+    })
+})
+
 // Ruta para la página de creación de cuentas (creacion.ejs)
 app.get('/registro', (req, res) => {
+    res.locals.userRole = userRole; //Variable local para tomar el rol del usuario
     res.render('creacion', {
         pageTitle: 'Crear Cuenta',
     })
@@ -128,6 +187,7 @@ app.post('/registrar', (req, res) => {
 
 // Ruta para los productos
 app.get('/productos', (req, res) => {
+    res.locals.userRole = userRole; //Variable local para tomar el rol del usuario
     const sql = 'SELECT * FROM productos'
     connection.query(sql, (err, results) => {
         if (err) {
@@ -211,7 +271,8 @@ app.post('/productos/agregar', upload.single('imagen'), (req, res) => {
                         return;
                     }
                     //res.redirect('/productos');
-                    res.redirect('/productos?registroExitoso=true')
+                    console.log("Producto agregado exitosamente!!!")
+                    res.redirect('/productos')
                 })
             })
     } else {
@@ -231,6 +292,7 @@ app.post('/productos/agregar', upload.single('imagen'), (req, res) => {
 //Paginas individuales de productos
 // Página de detalles del producto
 app.get('/productos/:productoId', (req, res) => {
+    res.locals.userRole = userRole; //Variable local para tomar el rol del usuario
     const productoId = req.params.productoId
     // Consulta la base de datos para obtener la información del producto con el ID proporcionado
     connection.query('SELECT * FROM productos WHERE id = ?', [productoId], (err, results) => {
