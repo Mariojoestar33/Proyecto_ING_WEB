@@ -157,6 +157,7 @@ app.get("/cerrar", (req, res) => {
             console.error('Error al cerrar la sesión:', err);
         } else {
             // Redirige al usuario a una página de inicio de sesión o a la página principal
+            console.log('Cerrado de sesion exitoso!!!')
             res.redirect('/'); // Cambia '/login' a la ruta que desees
         }
     })
@@ -171,30 +172,33 @@ app.get('/registro', (req, res) => {
 })
 
 //Agregar usuario (registro)
-app.post('/registrar', (req, res) => {
+app.post('/registro', (req, res) => {
     const nombre = req.body.nombre
     const correo = req.body.correo
     const contrasenia = req.body.contrasenia
     const confirmar_contrasenia = req.body.confirmar_contrasenia
     const tipo = "cliente"
-    if (!nombre || !correo || !contrasenia || !confirmar_contrasenia || !tipo) { // Validación de datos (puedes agregar más validaciones según tus necesidades)
-        console.log("nombre", nombre, "correo", correo, "contrasenia", contrasenia, "confirmar_contrasenia", confirmar_contrasenia, "tipo", tipo)
+    
+    if (!nombre || !correo || !contrasenia || !confirmar_contrasenia || !tipo) { 
         return res.status(400).send('Todos los campos son obligatorios.')
     }
-    if (contrasenia !== confirmar_contrasenia) {
-        return res.status(400).send('Las contraseñas no coinciden.')
+
+    if (contrasenia.length < 8 || contrasenia !== confirmar_contrasenia) {
+        return res.status(400).send('La contraseña debe tener 8 caracteres (minimos) o las contraseñas no coinciden.')
     }
-    try {  //Prueba de encriptacion
+
+    try {  
         const hash = createHash('sha256').update(contrasenia).digest('hex')
         const sql = 'INSERT INTO users (nombre, correo, tipo, contrasenia) VALUES (?, ?, ?, ?)'
-        connection.query(sql, [nombre, correo, tipo, hash], (err, resultado) => { //Uso de "resultado" en lugar de "res" para evvitar colisiones
+        
+        connection.query(sql, [nombre, correo, tipo, hash], (err, resultado) => { 
             if (err) {
                 console.error('Error al registrar usuario:', err)
                 return res.status(500).send('Error interno del servidor')
             }
             console.log("Usuario registrado exitosamente!!!")
-            return res.redirect("/login") // Redirige al usuario a la página de inicio de sesión después del registro
-        })
+            return res.redirect("/login")
+        });
     } catch(err) {
         console.error('Error al encriptar la contraseña:', err)
         return res.status(500).send('Error interno del servidor')
@@ -285,10 +289,11 @@ app.post('/perfil/direcciones/agregar', (req, res) => {
 })
 
 // Ruta para modificar una dirección existente
-app.get('/perfil/direcciones/modificar/:direccionId', (req, res) => {
+app.get('/perfil/direcciones/modificar/:userID/:direccionId', (req, res) => {
     // Mostrar formulario de modificación
     res.locals.userRole = userRole
     const direccionId = req.params.direccionId
+
     // Consulta a la base de datos para obtener la dirección con el ID proporcionado
     const sql = 'SELECT * FROM direcciones WHERE id = ?'
     connection.query(sql, [direccionId], (err, direccion) => {
@@ -304,7 +309,8 @@ app.get('/perfil/direcciones/modificar/:direccionId', (req, res) => {
     })
 })
 
-app.post('/perfil/direcciones/modificar/:direccionId', (req, res) => {
+//Ruta para modificar la direccion
+app.post('/perfil/direcciones/modificar/:userID/:direccionId', (req, res) => {
     // Manejar la modificación de la dirección y actualizar la base de datos
     const direccionId = req.params.direccionId
     const nuevaCalle = req.body.calle
@@ -323,6 +329,82 @@ app.post('/perfil/direcciones/modificar/:direccionId', (req, res) => {
             res.redirect('/perfil/direcciones')
         }
     })
+})
+
+//Ruta para eliminar la direccion seleccionada
+app.post('/perfil/direcciones/eliminar', (req, res) => {
+    // Obtén el ID de la dirección a eliminar desde el formulario
+    const direccionId = req.body.direccionId
+
+    // Realiza una consulta SQL para eliminar la dirección con el ID proporcionado
+    const sql = 'DELETE FROM direcciones WHERE id = ?'
+    connection.query(sql, [direccionId], (err, result) => {
+        if (err) {
+            console.error('Error al eliminar la dirección:', err)
+            res.status(500).send('Error interno del servidor')
+        } else {
+            // Redirige al usuario de vuelta a la página de direcciones después de eliminar
+            res.redirect('/perfil/direcciones')
+        }
+    })
+})
+
+//Ruta para modificar contraseña render
+app.get('/perfil/modificar/contrasenia', (req, res) => {
+    if (req.session.usuario) { // Asegúrate de que el usuario esté autenticado
+        res.locals.userRole = userRole
+        const user = req.session.usuario
+        res.render('modificarContrasenia', {
+            pageTitle: 'Cambiar Contraseña',
+            user: user,
+            userRole: userRole
+        })
+    } else {
+        res.redirect('/login') // Redirige al usuario a la página de inicio de sesión si no está autenticado
+    }
+})
+
+// Ruta POST para procesar la modificación segura de la contraseña
+app.post('/perfil/modificar/contrasenia', (req, res) => {
+    if (req.session.usuario) {
+        const userId = req.session.usuario.id
+        const newPassword = req.body.password
+        const confirmPassword = req.body.confirmPassword
+
+        // Validación de las contraseñas
+        if (!newPassword || newPassword.length < 8) {
+            console.log('No se realizo el cambio de contraseña...')
+            user = req.session.usuario
+            userRole = req.session.usuario.tipo
+            return res.render('modificarContrasenia', {
+                pageTitle: 'La nueva contraseña debe tener al menos 8 caracteres.',
+                userRole: userRole
+            })
+        }
+
+        if (newPassword !== confirmPassword) {
+            return res.render('modificarContrasenia', {
+                pageTitle: 'Modificar Contraseña',
+                user: req.session.usuario,
+                error: 'Las contraseñas no coinciden.'
+            })
+        }
+        // Genera un hash de la nueva contraseña con SHA-256
+        const hash = createHash('sha256').update(newPassword).digest('hex')
+        // Actualiza la contraseña (hash) en la base de datos
+        const sql = 'UPDATE users SET contrasenia = ? WHERE id = ?'
+        connection.query(sql, [hash, userId], (err, result) => {
+            if (err) {
+                console.error('Error al actualizar la contraseña:', err)
+                res.status(500).send('Error interno del servidor')
+            } else {
+                console.log("Contraseña actualizada exitosamente!!!")
+                res.redirect('/perfil')
+            }
+        })
+    } else {
+        res.redirect('/login')
+    }
 })
 
 // Ruta para los productos
