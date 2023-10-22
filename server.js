@@ -202,7 +202,7 @@ app.post('/registrar', (req, res) => {
 })
 
 //Metodo para modificar el perfil del usuario logeado
-app.post('/modificarPerfil', (req, res) => {
+app.post('/perfil/modificar', (req, res) => {
     if (req.session.usuario) {
         const nuevoNombre = req.body.nombre // Obtén el nuevo nombre de usuario del formulario
         // Realiza la actualización del nombre de usuario en la base de datos
@@ -255,34 +255,75 @@ app.get('/perfil/direcciones/agregar', (req, res) => {
         res.render('agregarDireccion', {
             pageTitle: 'Agregar Dirección',
             userRole: req.session.usuario.tipo,
-        });
+        })
     } else {
-        res.redirect('/login'); // Redirige al usuario a la página de inicio de sesión si no ha iniciado sesión
+        res.redirect('/login') // Redirige al usuario a la página de inicio de sesión si no ha iniciado sesión
     }
-});
+})
 
 // Ruta para procesar la adición de una dirección
 app.post('/perfil/direcciones/agregar', (req, res) => {
     if (req.session.usuario) {
-        const userId = req.session.usuario.id;
-        const { calle, numero_exterior, ciudad, cp, colonia } = req.body;
+        const userId = req.session.usuario.id
+        const { calle, numero_exterior, ciudad, cp, colonia } = req.body
 
         // Inserta la nueva dirección en la base de datos
         const sql = 'INSERT INTO direcciones (id_usuario, calle, numero_exterior, ciudad, cp, colonia) VALUES (?, ?, ?, ?, ?, ?)';
         connection.query(sql, [userId, calle, numero_exterior, ciudad, cp, colonia], (err, result) => {
             if (err) {
-                console.error('Error al agregar dirección:', err);
-                res.status(500).send('Error interno del servidor');
-                return;
+                console.error('Error al agregar dirección:', err)
+                res.status(500).send('Error interno del servidor')
+                return
             }
 
             // Redirige al usuario de regreso a la página de direcciones después de agregar la dirección
-            res.redirect('/perfil/direcciones');
-        });
+            res.redirect('/perfil/direcciones')
+        })
     } else {
-        res.redirect('/login'); // Redirige al usuario a la página de inicio de sesión si no ha iniciado sesión
+        res.redirect('/login') // Redirige al usuario a la página de inicio de sesión si no ha iniciado sesión
     }
-});
+})
+
+// Ruta para modificar una dirección existente
+app.get('/perfil/direcciones/modificar/:direccionId', (req, res) => {
+    // Mostrar formulario de modificación
+    res.locals.userRole = userRole
+    const direccionId = req.params.direccionId
+    // Consulta a la base de datos para obtener la dirección con el ID proporcionado
+    const sql = 'SELECT * FROM direcciones WHERE id = ?'
+    connection.query(sql, [direccionId], (err, direccion) => {
+        if (err) {
+            console.error('Error al obtener dirección:', err)
+            res.status(500).send('Error interno del servidor')
+        } else {
+            res.render('modificarDireccion', {
+                pageTitle: 'Modificar Dirección',
+                direccion: direccion[0],
+            })
+        }
+    })
+})
+
+app.post('/perfil/direcciones/modificar/:direccionId', (req, res) => {
+    // Manejar la modificación de la dirección y actualizar la base de datos
+    const direccionId = req.params.direccionId
+    const nuevaCalle = req.body.calle
+    const nuevoNumeroExterior = req.body.numero_exterior
+    const nuevaColonia = req.body.colonia
+    const nuevaCiudad = req.body.ciudad
+    const nuevoCP = req.body.cp
+
+    // Realizar una consulta SQL para actualizar los datos en la base de datos
+    const sql = 'UPDATE direcciones SET calle = ?, numero_exterior = ?, colonia = ?, ciudad = ?, cp = ? WHERE id = ?'
+    connection.query(sql, [nuevaCalle, nuevoNumeroExterior, nuevaColonia, nuevaCiudad, nuevoCP, direccionId], (err, result) => {
+        if (err) {
+            console.error('Error al actualizar dirección:', err)
+            res.status(500).send('Error interno del servidor')
+        } else {
+            res.redirect('/perfil/direcciones')
+        }
+    })
+})
 
 // Ruta para los productos
 app.get('/productos', (req, res) => {
