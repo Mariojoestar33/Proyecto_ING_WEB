@@ -130,7 +130,6 @@ app.post('/logear', (req, res) => {
         } else if (results.length === 1) {
             const usuario = results[0]
             const hashContrasenia = createHash('sha256').update(contrasenia).digest('hex')
-
             //console.log("Usuario encontrado:", usuario)
             //console.log("Contraseña proporcionada:",hashContrasenia)
             //console.log("Contraseña encontrada en la base de datos", usuario.contrasenia)
@@ -201,6 +200,89 @@ app.post('/registrar', (req, res) => {
         return res.status(500).send('Error interno del servidor')
     }
 })
+
+//Metodo para modificar el perfil del usuario logeado
+app.post('/modificarPerfil', (req, res) => {
+    if (req.session.usuario) {
+        const nuevoNombre = req.body.nombre // Obtén el nuevo nombre de usuario del formulario
+        // Realiza la actualización del nombre de usuario en la base de datos
+        const userId = req.session.usuario.id // Reemplaza con la propiedad correcta de tu sesión
+        const sql = 'UPDATE users SET nombre = ? WHERE id = ?'
+        connection.query(sql, [nuevoNombre, userId], (err, result) => {
+            if (err) {
+                console.error('Error al actualizar el nombre de usuario:', err)
+                res.status(500).send('Error interno del servidor')
+            } else {
+                // Actualización exitosa, redirige al usuario a su perfil con el nuevo nombre
+                console.log("Nombre de usuario actualizado exitosamente!!!")
+                req.session.usuario.nombre = nuevoNombre // Actualiza el nombre en la sesión
+                res.redirect('/perfil')
+            }
+        })
+    } else {
+        // El usuario no ha iniciado sesión, redirige a la página de inicio de sesión
+        res.redirect('/login');
+    }
+})
+
+//Ruta para visualizar las direcciones del perfil logeado
+app.get('/perfil/direcciones', (req, res) => {
+    if (req.session.usuario) {
+        res.locals.userRole = userRole
+        const userId = req.session.usuario.id
+        // Consulta la base de datos para obtener las direcciones del usuario con el ID proporcionado
+        const sql = 'SELECT * FROM direcciones WHERE id_usuario = ?'
+        connection.query(sql, [userId], (err, results) => {
+            if (err) {
+                console.error('Error al recuperar las direcciones del usuario:', err)
+                res.status(500).send('Error interno del servidor')
+                return
+            }
+
+            res.render('direcciones', {
+                pageTitle: 'Direcciones',
+                direcciones: results,
+            })
+        })
+    } else {
+        res.redirect('/login') // Redirige al usuario a la página de inicio de sesión si no ha iniciado sesión
+    }
+})
+
+// Ruta para mostrar el formulario de agregar dirección
+app.get('/perfil/direcciones/agregar', (req, res) => {
+    if (req.session.usuario) {
+        res.render('agregarDireccion', {
+            pageTitle: 'Agregar Dirección',
+            userRole: req.session.usuario.tipo,
+        });
+    } else {
+        res.redirect('/login'); // Redirige al usuario a la página de inicio de sesión si no ha iniciado sesión
+    }
+});
+
+// Ruta para procesar la adición de una dirección
+app.post('/perfil/direcciones/agregar', (req, res) => {
+    if (req.session.usuario) {
+        const userId = req.session.usuario.id;
+        const { calle, numero_exterior, ciudad, cp, colonia } = req.body;
+
+        // Inserta la nueva dirección en la base de datos
+        const sql = 'INSERT INTO direcciones (id_usuario, calle, numero_exterior, ciudad, cp, colonia) VALUES (?, ?, ?, ?, ?, ?)';
+        connection.query(sql, [userId, calle, numero_exterior, ciudad, cp, colonia], (err, result) => {
+            if (err) {
+                console.error('Error al agregar dirección:', err);
+                res.status(500).send('Error interno del servidor');
+                return;
+            }
+
+            // Redirige al usuario de regreso a la página de direcciones después de agregar la dirección
+            res.redirect('/perfil/direcciones');
+        });
+    } else {
+        res.redirect('/login'); // Redirige al usuario a la página de inicio de sesión si no ha iniciado sesión
+    }
+});
 
 // Ruta para los productos
 app.get('/productos', (req, res) => {

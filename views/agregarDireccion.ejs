@@ -1,0 +1,38 @@
+<!-- direcciones_agregar.ejs -->
+<!DOCTYPE html>
+<html lang="es">
+    <%- include('head')%>
+    <body>
+        <header>
+            <%- include('navbar')%>
+        </header>
+        <div class="cuerpoPerfil">
+            <div class="menuizquierdo">
+                <ul class="lateralmenu">
+                    <li><a href="/perfil">Información personal</a></li>
+                    <li><a href="/perfil/direcciones">Direcciones</a></li>
+                    <li><a href="/perfil/compras">Compras</a></li>
+                    <li><a href="/cerrar">Cerrar sesión</a></li>
+                </ul>
+            </div>
+            <div>
+                <h2>Agregar Nueva Dirección</h2>
+                <form action="/perfil/direcciones/agregar" method="post" class="datosPerfil">
+                    <label for="calle">Calle: </label>
+                    <input type="text" class="form-control" id="calle" name="calle">
+                    <label for="numero_exterior">Número Exterior: </label>
+                    <input type="text" class="form-control" id="numero_exterior" name="numero_exterior">
+                    <label for="colonia">Colonia: </label>
+                    <input type="text" class="form-control" id="colonia" name="colonia">
+                    <label for="ciudad">Ciudad: </label>
+                    <input type="text" class="form-control" id="ciudad" name="ciudad">
+                    <label for="cp">Código Postal: </label>
+                    <input type="text" class="form-control" id="cp" name="cp">
+                    <br>
+                    <button type="submit" class="btn btn-primary">Agregar Dirección</button>
+                </form>
+            </div>
+        </div>
+        <%- include('footer', { currentYear: new Date().getFullYear() })%>
+    </body>
+</html>

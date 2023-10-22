@@ -173,6 +173,16 @@ header {
     color: #000000;
 }
 
+.columna-envios > img {
+    transform: scale(1);
+    transition: all 0.5s ease-in-out;
+}
+
+.columna-envios > img:hover {
+    transform: scale(1.4);
+    transition: all 0.5s ease-in-out;
+}
+
 /*End of Compromisos*/
 
 .div-instagram {
@@ -374,6 +384,7 @@ footer {
     grid-template-columns: 500px auto;
     margin-top: 40px;
     margin: 20px;
+    margin-right: 500px;
 }
 
 .lateralmenu {
@@ -389,6 +400,11 @@ footer {
     list-style: none;
 }
 
+.submenu > li:hover {
+    background-color: rgb(212, 207, 207);
+    border-radius: 10px;
+}
+
 .submenu > li > a {
     text-decoration: none;
     color: #000000;
@@ -400,4 +416,19 @@ footer {
 
 .container {
     margin-top: 40px;
+}
+
+.botonesDireccion {
+    display: flex;
+    justify-content: center;
+}
+
+#botonAgregar {
+    display: flex;
+    justify-content: center;
+}
+
+#botonAgregar > a {
+    text-decoration: none;
+    color: #ffffff;
 }
