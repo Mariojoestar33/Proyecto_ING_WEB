@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `productos` (
   `nombre` varchar(64) DEFAULT NULL,
   `categoria` varchar(64) DEFAULT NULL,
   `stock` int DEFAULT NULL,
-  `descripcion` varchar(64) DEFAULT NULL,
+  `descripcion` varchar(255) DEFAULT NULL,
   `imagen` varchar(255) DEFAULT NULL,
   `precio` decimal(10,2) DEFAULT NULL,
   `marca` varchar(64) DEFAULT NULL,
