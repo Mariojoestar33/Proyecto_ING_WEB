@@ -116,8 +116,8 @@ app.get('/login', (req, res) => {
     })
 })
 
-// Ruta de inicio de sesión
-app.post('/logear', (req, res) => {
+// Ruta de inicio de sesión //Agregar token para evitar ataques de fuerza bruta
+app.post('/login', (req, res) => {
     const correo = req.body.correo
     const contrasenia = req.body.contrasenia
 
@@ -130,9 +130,6 @@ app.post('/logear', (req, res) => {
         } else if (results.length === 1) {
             const usuario = results[0]
             const hashContrasenia = createHash('sha256').update(contrasenia).digest('hex')
-            //console.log("Usuario encontrado:", usuario)
-            //console.log("Contraseña proporcionada:",hashContrasenia)
-            //console.log("Contraseña encontrada en la base de datos", usuario.contrasenia)
             // Comparar la contraseña proporcionada con la almacenada
             if (hashContrasenia === usuario.contrasenia) {
                 // Contraseña válida, crear una sesión para el usuario
@@ -171,7 +168,7 @@ app.get('/registro', (req, res) => {
     })
 })
 
-//Agregar usuario (registro)
+//Agregar usuario (registro) 
 app.post('/registro', (req, res) => {
     const nombre = req.body.nombre
     const correo = req.body.correo
@@ -279,8 +276,8 @@ app.post('/perfil/direcciones/agregar', (req, res) => {
                 res.status(500).send('Error interno del servidor')
                 return
             }
-
             // Redirige al usuario de regreso a la página de direcciones después de agregar la dirección
+            console.log("Direccion agregada exitosamente!!!")
             res.redirect('/perfil/direcciones')
         })
     } else {
@@ -290,23 +287,27 @@ app.post('/perfil/direcciones/agregar', (req, res) => {
 
 // Ruta para modificar una dirección existente
 app.get('/perfil/direcciones/modificar/:userID/:direccionId', (req, res) => {
-    // Mostrar formulario de modificación
-    res.locals.userRole = userRole
-    const direccionId = req.params.direccionId
+    if(req.session.usuario) { // Asegurarse que este la sesion iniciada para poder hacer modificaciones dentro
+        // Mostrar formulario de modificación
+        res.locals.userRole = userRole
+        const direccionId = req.params.direccionId
 
-    // Consulta a la base de datos para obtener la dirección con el ID proporcionado
-    const sql = 'SELECT * FROM direcciones WHERE id = ?'
-    connection.query(sql, [direccionId], (err, direccion) => {
-        if (err) {
-            console.error('Error al obtener dirección:', err)
-            res.status(500).send('Error interno del servidor')
-        } else {
-            res.render('modificarDireccion', {
-                pageTitle: 'Modificar Dirección',
-                direccion: direccion[0],
-            })
-        }
-    })
+        // Consulta a la base de datos para obtener la dirección con el ID proporcionado
+        const sql = 'SELECT * FROM direcciones WHERE id = ?'
+        connection.query(sql, [direccionId], (err, direccion) => {
+            if (err) {
+                console.error('Error al obtener dirección:', err)
+                res.status(500).send('Error interno del servidor')
+            } else {
+                res.render('modificarDireccion', {
+                    pageTitle: 'Modificar Dirección',
+                    direccion: direccion[0],
+                })
+            }
+        })
+    } else {
+        res.redirect('/login') // Redirige al usuario a la página de inicio de sesión si no ha iniciado sesión
+    }
 })
 
 //Ruta para modificar la direccion
@@ -344,6 +345,7 @@ app.post('/perfil/direcciones/eliminar', (req, res) => {
             res.status(500).send('Error interno del servidor')
         } else {
             // Redirige al usuario de vuelta a la página de direcciones después de eliminar
+            console.log("Direccion borrada exitosamente!!!")
             res.redirect('/perfil/direcciones')
         }
     })
@@ -570,8 +572,7 @@ app.post('/productos/agregar', upload.single('imagen'), (req, res) => {
                         res.status(500).send('Error interno del servidor')
                         return;
                     }
-                    //res.redirect('/productos');
-                    console.log("Producto agregado exitosamente!!!")
+                    console.log("Producto agregado exitosamente!!!") //Se efectuo el registro del producto de manera satisfactoria
                     res.redirect('/productos')
                 })
             })
@@ -607,9 +608,112 @@ app.get('/productos/:productoId', (req, res) => {
         const product = results[0]
         res.render('producto', {
             pageTitle: product.nombre,
-            product
+            product,
+            userRole: userRole
         })
     })
+})
+
+// Ruta para mostrar el formulario de edición protegido (GET)
+app.get('/productos/:productoId/editar', (req, res) => {
+    if (req.session.usuario && (req.session.usuario.tipo === "editor" || req.session.usuario.tipo === "administrador")) {
+        res.locals.userRole = userRole  //Variable local para tomar el rol del usuario
+        const productoId = req.params.productoId
+        // Consulta la base de datos para obtener la información del producto con el ID proporcionado
+        connection.query('SELECT * FROM productos WHERE id = ?', [productoId], (err, results) => {
+            if (err) {
+                console.error('Error al recuperar los detalles del producto:', err)
+                res.status(500).send('Error interno del servidor')
+                return;
+            }
+            if (results.length === 0) {
+                res.status(404).send('Producto no encontrado')
+                return;
+            }
+            const product = results[0]
+            res.render('editarProducto', {
+                pageTitle: `Editar ${product.nombre}`,
+                product,
+            })
+        })
+    } else {
+        res.status(403).send('Acceso denegado')
+    }
+})
+
+// Ruta para procesar la actualización protegida (POST)
+app.post('/productos/:productoId/editar', (req, res) => {
+    if (req.session.usuario && (req.session.usuario.tipo === "editor" || req.session.usuario.tipo === "administrador")) {
+        const productoId = req.params.productoId
+        const { nombre, categoria, stock, descripcion, precio, marca } = req.body
+
+        // Consulta para actualizar la información del producto (sin la imagen)
+        connection.query(
+            'UPDATE productos SET nombre = ?, stock = ?, descripcion = ?, precio = ?, marca = ? WHERE id = ?',
+            [nombre, stock, descripcion, precio, marca, productoId],
+            (err, results) => {
+                if (err) {
+                    console.error('Error al actualizar el producto:', err)
+                    res.status(500).send('Error interno del servidor')
+                    return
+                }
+                //Se actualizo satisfactoriamente el producto
+                console.log("Producto actualizado exitosamente!!!")
+                res.redirect(`/productos/${productoId}`)
+            }
+        )
+    } else {
+        res.status(403).send('Acceso denegado')
+    }
+})
+
+// Ruta para procesar la eliminación de un producto (POST)
+app.post('/productos/:productoId/eliminar', (req, res) => {
+    if (req.session.usuario && req.session.usuario.tipo === "administrador") {
+        const productoId = req.params.productoId
+        // Consulta para eliminar el producto
+        connection.query('DELETE FROM productos WHERE id = ?', [productoId], (err, results) => {
+            if (err) {
+                console.error('Error al eliminar el producto:', err)
+                res.status(500).send('Error interno del servidor')
+                return
+            }
+            // Redirige al usuario a la página de productos con una alerta de éxito
+            console.log("Producto eliminado exitosamente!!!")
+            res.redirect('/productos')
+        })
+    } else {
+        res.status(403).send('Acceso denegado')
+    }
+})
+
+//Ruta para usuarios
+app.get('/usuarios', (req, res) => {
+    if (req.session.usuario && req.session.usuario.tipo === "administrador") {
+        res.locals.userRole = userRole
+        // Consulta para obtener todos los usuarios
+        connection.query("SELECT * FROM users", (err, results) => {
+            if (err) {
+                console.error('Error al recuperar los usuarios:', err)
+                res.status(500).send('Error interno del servidor')
+                return
+            }
+            // Organiza los usuarios en grupos según su tipo
+            const usuariosAdmin = results.filter(user => user.tipo === 'administrador')
+            const usuariosCliente = results.filter(user => user.tipo === 'cliente')
+            const usuariosEditor = results.filter(user => user.tipo === 'editor')
+            
+            res.render('usuarios', {
+                pageTitle: 'Usuarios',
+                usuariosAdmin: usuariosAdmin,
+                usuariosCliente: usuariosCliente,
+                usuariosEditor: usuariosEditor,
+            })
+        })
+    } else {
+        // No cumple los parámetros de acceso
+        res.status(403).send('Acceso denegado')
+    }
 })
 
 // Iniciar el servidor en el puerto 3000

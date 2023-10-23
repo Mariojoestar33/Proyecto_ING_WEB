@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+    <%- include('head') %>
+    <body>
+        <header>
+            <%- include('navbar') %>
+        </header>
+        <div class="container">
+            <h1 class="titulo">Usuarios</h1>
+
+            <div class="centrar">
+                <h2>Administradores (<%= usuariosAdmin.length%>)</h2>
+                <ul>
+                    <% usuariosAdmin.forEach((user) => { %>
+                        <br>
+                        <li>
+                            Nombre: <%= user.nombre %> </br> Correo: <%= user.correo %><br>
+                            <a href="/usuarios/<%= user.id %>/editar" class="btn btn-warning">Editar</a>
+                            <a href="/usuarios/<%= user.id %>/eliminar" class="btn btn-danger">Eliminar</a>
+                        </li>
+                    <% }); %>
+                </ul>
+                <h2>Editores (<%= usuariosEditor.length%>)</h2>
+                <ul>
+                    <% usuariosEditor.forEach((user) => {  %>
+                        <br>
+                        <li>
+                            Nombre: <%= user.nombre %> </br> Correo: <%= user.correo %><br>
+                            <a href="/usuarios/<%= user.id %>/editar" class="btn btn-warning">Editar</a>
+                            <a href="/usuarios/<%= user.id %>/eliminar" class="btn btn-danger">Eliminar</a>
+                        </li>
+                    <% }); %>
+                </ul>
+                <h2>Clientes (<%= usuariosCliente.length%>)</h2>
+                <ul>
+                    <% usuariosCliente.forEach((user) => {%>
+                        <br>
+                        <li>
+                            Nombre: <%= user.nombre %> </br> Correo: <%= user.correo %><br>
+                            <a href="/usuarios/<%= user.id %>/editar" class="btn btn-warning">Editar</a>
+                            <a href="/usuarios/<%= user.id %>/eliminar" class="btn btn-danger">Eliminar</a>
+                        </li>
+                    <% }); %>
+                </ul>
+            </div>
+        </div>
+        <%- include('footer', { currentYear: new Date().getFullYear() }) %>
+    </body>
+</html>

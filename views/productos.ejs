@@ -4,6 +4,15 @@
     <body>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="js/filtro.js"></script>
+        <script>
+            // Función para confirmar la eliminación
+            function confirmDelete(productId) {
+                if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+                    // Redirige al usuario para eliminar el producto
+                    window.location.href = `/productos/${productId}/eliminar`;
+                }
+            }
+        </script>
         <header>
             <%- include('navbar') %>
         </header>
@@ -14,13 +23,21 @@
                 <% products.forEach((product) => { %>
                     <div class="col-md-4 mb-4">
                         <div class="card" style="width: 18rem;">
-                            
-                            <img src="<%= product.imagen %>" class="card-img-top" alt="Imagen del producto">
+                            <img src="<%= product.imagen %>" class="card-img-top" alt="Imagen del producto" id="imagenProductos">
                             <div class="card-body">
                                 <h5 class="card-title" style="text-align: center;"><%= product.nombre %></h5>
                                 <p class="card-text" style="text-align: center;">Categoría: <%= product.categoria %></p>
                                 <p class="card-text" style="text-align: center;">Stock: <%= product.stock %></p>
-                                <a href="/productos/<%= product.id %>" class="btn btn-primary" style="width: 100%;">$<%= product.precio%></a>
+                                <a href="/productos/<%= product.id %>" class="btn btn-primary" style="width: 100%;">$<%= product.precio %></a>
+                                <% if (userRole === "administrador") { %>
+                                    <a href="/productos/<%= product.id %>/editar" class="btn btn-warning" style="width: 100%;">Editar</a>
+                                    <form action="/productos/<%= product.id %>/eliminar" method="post">
+                                        <input type="hidden" name="productoId value="<%= product.id %>">
+                                        <button type="submit" class="btn btn-danger" style="width: 100%;">Eliminar</button>
+                                    </form>
+                                <% } else if (userRole === "editor") { %>
+                                    <a href="/productos/<%= product.id %>/editar" class="btn btn-warning" style="width: 100%;">Editar</a>
+                                <% } %>
                             </div>
                         </div>
                     </div>
