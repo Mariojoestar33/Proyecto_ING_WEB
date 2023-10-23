@@ -576,8 +576,8 @@ app.post('/productos/:productoId/editar', (req, res) => {
 
         // Consulta para actualizar la información del producto (sin la imagen)
         connection.query(
-            'UPDATE productos SET nombre = ?, categoria = ?, stock = ?, descripcion = ?, precio = ?, marca = ? WHERE id = ?',
-            [nombre, categoria, stock, descripcion, precio, marca, productoId],
+            'UPDATE productos SET nombre = ?, stock = ?, descripcion = ?, precio = ?, marca = ? WHERE id = ?',
+            [nombre, stock, descripcion, precio, marca, productoId],
             (err, results) => {
                 if (err) {
                     console.error('Error al actualizar el producto:', err)
