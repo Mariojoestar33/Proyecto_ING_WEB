@@ -1,0 +1,15 @@
+<!-- carrito.ejs -->
+<h1>Carrito de Compras</h1>
+<ul>
+    <% carrito.forEach(producto => { %>
+        <li>
+            Producto: <%= producto.nombre %><br>
+            Descripción: <%= producto.descripcion %><br>
+            Cantidad: <%= producto.cantidad %><br>
+            Precio unitario: <%= producto.precio %><br>
+            Subtotal: <%= producto.precio * producto.cantidad %><br>
+            <a href="/eliminarDelCarrito/<%= producto.id %>">Eliminar del Carrito</a><br>
+        </li>
+    <% }) %>
+</ul>
+<a href="/realizarCompra">Realizar Compra</a>

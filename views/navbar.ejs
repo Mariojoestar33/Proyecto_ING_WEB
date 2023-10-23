@@ -1,13 +1,3 @@
-<!-- navbar.ejs -->
-<!--<nav class="navbarM">
-    <ul class="menu-horizontal">
-        <li><a href="/"><image src = "/images/favicon.png"></image>Inicio</a></li>
-        <li><a href="/conocenos">Conócenos</a></li>
-        <li><a href="/productos/agregar">Crochet</a></li>
-        <li><a href="/productos">Papeleria</a></li>
-        <li><a href="/login">Login</a></li>
-    </ul>
-</nav>-->
 <nav class="navbarM">
     <ul class="menu-horizontal">
         <li><a href="/"><image src = "/images/favicon.png"></image>Inicio</a></li>
@@ -15,6 +5,7 @@
         <% if (userRole == "cliente") { %>
             <li><a href="/productos">Papeleria</a></li>
             <li><a href="/perfil"><%= userName %></a></li>
+            <li><a href="/carrito"><img src="/images/cart.svg" alt="Carrito de compras" style="width: 20px;"></a></li>
         <% } else if(userRole == "editor") { %>
         <li><a href="/productos/agregar">Agregar</a></li>
         <li><a href="/productos/editar">Editar</a></li>

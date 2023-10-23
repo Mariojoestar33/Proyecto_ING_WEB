@@ -1,14 +1,10 @@
-<!-- direcciones.ejs -->
 <!DOCTYPE html>
 <html lang="es">
-    <%- include('head')%>
+    <%- include('head') %>
     <body>
         <header>
-            <%- include('navbar')%>
+            <%- include('navbar') %>
         </header>
-        <div class="botonesDireccion">
-            <button class="btn btn-primary" id="botonAgregar"><a href="/perfil/direcciones/agregar">Agregar Direccion</a></button>
-        </div>
         <div class="cuerpoPerfil">
             <div class="menuizquierdo">
                 <ul class="lateralmenu">
@@ -22,19 +18,23 @@
             <div>
                 <h2>Compras Realizadas</h2>
                 <ul>
-                    <% direcciones.forEach((direccion) => { %>
+                    <% compras.forEach((compra) => { %>
                         <li>
-                            <%= direccion.calle %>, <%= direccion.numero_exterior %>, <%= direccion.colonia %>, <%= direccion.ciudad %>, <%= direccion.cp %>
-                            <a href="/perfil/direcciones/modificar/<%= direccion.id_usuario %>/<%= direccion.id %>">Modificar</a>
-                            <form action="/perfil/direcciones/eliminar" method="post">
-                                <input type="hidden" name="direccionId" value="<%= direccion.id %>">
-                                <button type="submit" class="btn btn-primary">Eliminar</button>
-                            </form>
+                            <button class="compra-button" data-compra-id="<%= compra.id %>">
+                                Fecha de compra: <%= compra.fecha_compra %>
+                            </button>
+                            <div class="productos-comprados" id="productos-comprados-<%= compra.id %>">
+                                <!-- Aquí se mostrarán los productos comprados de esta compra -->
+                                <% compra.productos.forEach((producto) => { %>
+                                    <!-- Muestra detalles del producto, como nombre, cantidad, etc. -->
+                                    Nombre del producto: <%= producto.nombre %>, Cantidad: <%= producto.cantidad %>
+                                <% }) %>
+                            </div>
                         </li>
                     <% }) %>
                 </ul>
             </div>
         </div>
-        <%- include('footer', { currentYear: new Date().getFullYear() })%>
+        <%- include('footer', { currentYear: new Date().getFullYear() }) %>
     </body>
 </html>

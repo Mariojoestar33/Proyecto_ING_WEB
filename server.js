@@ -407,6 +407,79 @@ app.post('/perfil/modificar/contrasenia', (req, res) => {
     }
 })
 
+// Ruta para mostrar la página de compras
+app.get('/perfil/compras', (req, res) => {
+    if (req.session.usuario) {
+        //const userRole = req.session.usuario.tipo
+        res.locals.userRole = userRole
+        const userId = req.session.usuario.id
+        // Realiza una consulta para obtener las compras del usuario
+        const sql = 'SELECT * FROM compras WHERE id_usuario = ?'
+        connection.query(sql, [userId], (err, compras) => {
+            if (err) {
+                console.error('Error al obtener compras:', err)
+                return res.status(500).send('Error interno del servidor')
+            }
+
+            res.render('compras', {
+                pageTitle: 'Compras Realizadas',
+                compras: compras,
+            })
+        })
+    } else {
+        res.redirect('/login')
+    }
+})
+
+// Ruta POST para mostrar los productos comprados de una compra específica
+app.post('/perfil/compras/mostrarProductos', (req, res) => {
+    if (req.session.usuario) {
+        const userId = req.session.usuario.id
+        const compraId = req.body.compraId
+
+        // Realiza una consulta para obtener los productos comprados en la compra especificada
+        const sql = 'SELECT p.nombre, pc.cantidad_comprada FROM productos_compras pc JOIN productos p ON pc.id_producto = p.id WHERE pc.id_compra = ?'
+        connection.query(sql, [compraId], (err, productosComprados) => {
+            if (err) {
+                console.error('Error al obtener productos comprados:', err)
+                return res.status(500).send('Error interno del servidor')
+            }
+
+            res.json({ productos: productosComprados })
+        });
+    } else {
+        res.status(403).send('Acceso no autorizado')
+    }
+})
+
+// Ruta GET para mostrar el carrito de compras
+app.get('/carrito', (req, res) => {
+    if (req.session.usuario) {
+        const userId = req.session.usuario.id;
+
+        // Realiza una consulta para obtener los productos en el carrito del usuario
+        const sql = `
+        SELECT p.id, p.nombre, p.descripcion, p.precio, pc.cantidad_comprada
+        FROM productos_compras pc
+        JOIN productos p ON pc.id_producto = p.id
+        WHERE pc.id_usuario = ?;`
+
+        connection.query(sql, [userId], (err, productosEnCarrito) => {
+            if (err) {
+                console.error('Error al obtener productos en el carrito:', err);
+                return res.status(500).send('Error interno del servidor');
+            }
+
+            // Renderiza la página del carrito y pasa los productos al template
+            res.render('carrito', {
+                productos: productosEnCarrito
+            });
+        });
+    } else {
+        res.status(403).send('Acceso no autorizado');
+    }
+});
+
 // Ruta para los productos
 app.get('/productos', (req, res) => {
     res.locals.userRole = userRole //Variable local para tomar el rol del usuario
