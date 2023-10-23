@@ -499,8 +499,7 @@ app.post('/productos/agregar', upload.single('imagen'), (req, res) => {
                         res.status(500).send('Error interno del servidor')
                         return;
                     }
-                    //res.redirect('/productos');
-                    console.log("Producto agregado exitosamente!!!")
+                    console.log("Producto agregado exitosamente!!!") //Se efectuo el registro del producto de manera satisfactoria
                     res.redirect('/productos')
                 })
             })
@@ -583,8 +582,10 @@ app.post('/productos/:productoId/editar', (req, res) => {
                 if (err) {
                     console.error('Error al actualizar el producto:', err)
                     res.status(500).send('Error interno del servidor')
-                    return;
+                    return
                 }
+                //Se actualizo satisfactoriamente el producto
+                console.log("Producto actualizado exitosamente!!!")
                 res.redirect(`/productos/${productoId}`)
             }
         )
