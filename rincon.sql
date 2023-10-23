@@ -1,31 +1,5 @@
--- phpMyAdmin SQL Dump
--- version 5.2.0
--- https://www.phpmyadmin.net/
---
--- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 23-10-2023 a las 14:07:43
--- Versión del servidor: 8.0.31
--- Versión de PHP: 8.0.26
-
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- Base de datos: `rincon`
---
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `compras`
---
+CREATE DATABASE IF NOT EXISTS rincon;
+USE rincon;
 
 DROP TABLE IF EXISTS `compras`;
 CREATE TABLE IF NOT EXISTS `compras` (
@@ -34,13 +8,7 @@ CREATE TABLE IF NOT EXISTS `compras` (
   `fecha_compra` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_usuario` (`id_usuario`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `direcciones`
---
+);
 
 DROP TABLE IF EXISTS `direcciones`;
 CREATE TABLE IF NOT EXISTS `direcciones` (
@@ -53,11 +21,7 @@ CREATE TABLE IF NOT EXISTS `direcciones` (
   `colonia` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_usuario` (`id_usuario`)
-) ENGINE=MyISAM AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Volcado de datos para la tabla `direcciones`
---
+);
 
 INSERT INTO `direcciones` (`id`, `id_usuario`, `calle`, `numero_exterior`, `ciudad`, `cp`, `colonia`) VALUES
 (1, 1, 'Calle 1', '123', 'Ciudad A', '12345', 'Colonia X'),
@@ -77,12 +41,6 @@ INSERT INTO `direcciones` (`id`, `id_usuario`, `calle`, `numero_exterior`, `ciud
 (15, 15, 'Calle 15', '1212', 'Ciudad O', '22334', 'Colonia L'),
 (18, 21, 'Eten', '612-A', 'CDMX', '07730', 'San Bartolo Atepehuacan');
 
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `productos`
---
-
 DROP TABLE IF EXISTS `productos`;
 CREATE TABLE IF NOT EXISTS `productos` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -94,11 +52,7 @@ CREATE TABLE IF NOT EXISTS `productos` (
   `precio` decimal(10,2) DEFAULT NULL,
   `marca` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Volcado de datos para la tabla `productos`
---
+);
 
 INSERT INTO `productos` (`id`, `nombre`, `categoria`, `stock`, `descripcion`, `imagen`, `precio`, `marca`) VALUES
 (1, 'Cuaderno Scribe rojo', 'Papel', 50, 'Cuaderno profesional de cuadro chico con 200 hojas.', 'images/papel/cuaderno_1.jpg', '45.00', 'Scribe'),
@@ -120,12 +74,6 @@ INSERT INTO `productos` (`id`, `nombre`, `categoria`, `stock`, `descripcion`, `i
 (20, 'Libreta forma francesa', 'Papel', 20, 'Libreta Scribbe con forma francesa y rayas de 100 hojas.', 'images/Papel/libreta-forma-francesa.jpg', '98.00', 'Scribe'),
 (18, 'Tijeras 3', 'Herramientas', 2, 'Si', 'images/Herramientas/tijeras-3.jpg', '24.00', 'Borax');
 
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `productos_compras`
---
-
 DROP TABLE IF EXISTS `productos_compras`;
 CREATE TABLE IF NOT EXISTS `productos_compras` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -135,13 +83,7 @@ CREATE TABLE IF NOT EXISTS `productos_compras` (
   PRIMARY KEY (`id`),
   KEY `id_compra` (`id_compra`),
   KEY `id_producto` (`id_producto`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `users`
---
+);
 
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
@@ -152,11 +94,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `contrasenia` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `correo` (`correo`)
-) ENGINE=MyISAM AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Volcado de datos para la tabla `users`
---
+);
 
 INSERT INTO `users` (`id`, `nombre`, `correo`, `tipo`, `contrasenia`) VALUES
 (19, 'Mariano Peña Romero', 'mariano.pena15@gmail.com', 'administrador', 'a2a816e9eff8ef8eb22aa464879ee3a51f7fe9757a6a3a1fa012bed349b2c258'),
@@ -175,8 +113,3 @@ INSERT INTO `users` (`id`, `nombre`, `correo`, `tipo`, `contrasenia`) VALUES
 (15, 'Antonio', 'antonio@example.com', 'cliente', 'hash15'),
 (18, 'Jorge', 'raiden12@gmail.com', 'cliente', 'a2a816e9eff8ef8eb22aa464879ee3a51f7fe9757a6a3a1fa012bed349b2c258'),
 (21, 'Tania Soto Hernandez', 'tann07lee04@gmail.com', 'cliente', '9df7d62dbc19dc31d1a11e7e9fe399babedfba0473235452fa1d357b9dddaf3c');
-COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

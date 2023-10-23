@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<%- include('head') %>
+<body>
+    <header>
+        <%- include('navbar') %>
+    </header>
+    <div class="container">
+        <h1 class="titulo">Editar Producto</h1>
+        <h1 class="titulo"><%= product.nombre %></h1>
+        <form action="/productos/<%= product.id %>/editar" method="POST" class="formulario">
+
+            <!-- Imagen (puedes mostrarla pero no permitir su edición) -->
+            <p>Imagen:</p>
+            <img class = "imagenproducto" src="/<%= product.imagen %>" alt="<%= product.nombre %>">
+
+            <!-- Nombre -->
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" value="<%= product.nombre %>">
+
+            <!-- Descripción -->
+            <label for="descripcion">Descripción:</label>
+            <textarea id="descripcion" name="descripcion"><%= product.descripcion %></textarea>
+
+            <!-- Stock -->
+            <label for="stock">Stock:</label>
+            <input type="number" id="stock" name="stock" value="<%= product.stock %>">
+
+            <!-- Precio (agrega más campos según tus necesidades) -->
+            <label for="precio">Precio:</label>
+            <input type="number" id="precio" name="precio" value="<%= product.precio %>">
+            
+            <!-- Marca (agrega más campos según tus necesidades) -->
+            <label for="marca">Marca:</label>
+            <input type="text" id="marca" name="marca" value="<%= product.marca %>">
+
+            <!-- Botón para modificar -->
+            <button type="submit" class="btn btn-warning" style="width: 100%;">Modificar</button>
+        </form>
+    </div>
+    <%- include('footer', { currentYear: new Date().getFullYear() }) %>
+</body>
+</html>
