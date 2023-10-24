@@ -448,7 +448,7 @@ app.post('/perfil/compras/mostrarProductos', (req, res) => {
             }
 
             res.json({ productos: productosComprados })
-        });
+        })
     } else {
         res.status(403).send('Acceso no autorizado')
     }
@@ -457,30 +457,24 @@ app.post('/perfil/compras/mostrarProductos', (req, res) => {
 // Ruta GET para mostrar el carrito de compras
 app.get('/carrito', (req, res) => {
     if (req.session.usuario) {
-        const userId = req.session.usuario.id;
-
+        const userId = req.session.usuario.id
         // Realiza una consulta para obtener los productos en el carrito del usuario
-        const sql = `
-        SELECT p.id, p.nombre, p.descripcion, p.precio, pc.cantidad_comprada
-        FROM productos_compras pc
-        JOIN productos p ON pc.id_producto = p.id
-        WHERE pc.id_usuario = ?;`
+        const sql = `SELECT p.id, p.nombre, p.descripcion, p.precio, pc.cantidad_comprada FROM productos_compras pc JOIN productos p ON pc.id_producto = p.id WHERE pc.id_usuario = ?`
 
         connection.query(sql, [userId], (err, productosEnCarrito) => {
             if (err) {
-                console.error('Error al obtener productos en el carrito:', err);
-                return res.status(500).send('Error interno del servidor');
+                console.error('Error al obtener productos en el carrito:', err)
+                return res.status(500).send('Error interno del servidor')
             }
-
             // Renderiza la página del carrito y pasa los productos al template
             res.render('carrito', {
                 productos: productosEnCarrito
-            });
-        });
+            })
+        })
     } else {
-        res.status(403).send('Acceso no autorizado');
+        res.status(403).send('Acceso no autorizado')
     }
-});
+})
 
 // Ruta para los productos
 app.get('/productos', (req, res) => {
@@ -552,7 +546,6 @@ app.post('/productos/agregar', upload.single('imagen'), (req, res) => {
                 if (fs.existsSync(imagePath)) {
                     fs.unlinkSync(imagePath);
                 }
-
                 // Construye la nueva ruta de la imagen basada en la categoría y el nombre del producto
                 const categoriaProducto = categoria || nueva_categoria;
                 const nombreProducto = nombre.toLowerCase().replace(/\s+/g, '-'); // Convierte espacios en guiones
@@ -585,7 +578,7 @@ app.post('/productos/agregar', upload.single('imagen'), (req, res) => {
                 res.status(500).send('Error interno del servidor')
                 return
             }
-            res.redirect('/productos?registroExitoso=true')
+            res.redirect('/productos')
         })
     }
 })
