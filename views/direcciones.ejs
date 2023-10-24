@@ -20,19 +20,24 @@
                 </ul>
             </div>
             <div>
-                <h2>Direcciones Guardadas</h2>
-                <ul>
-                    <% direcciones.forEach((direccion) => { %>
-                        <li>
-                            <%= direccion.calle %>, <%= direccion.numero_exterior %>, <%= direccion.colonia %>, <%= direccion.ciudad %>, <%= direccion.cp %>
-                            <a href="/perfil/direcciones/modificar/<%= direccion.id_usuario %>/<%= direccion.id %>">Modificar</a>
-                            <form action="/perfil/direcciones/eliminar" method="post">
-                                <input type="hidden" name="direccionId" value="<%= direccion.id %>">
-                                <button type="submit" class="btn btn-primary">Eliminar</button>
-                            </form>
-                        </li>
-                    <% }) %>
-                </ul>
+                <h2>Direcciones Guardadas (<%= direcciones.length%>)</h2>
+                <% if (direcciones.length <= 0) { %>
+                    <br>
+                    <h5>Sin direcciones guardadas</h5>
+                <% } else { %>
+                    <ul>
+                        <% direcciones.forEach((direccion) => { %>
+                            <li>
+                                <%= direccion.calle %>, <%= direccion.numero_exterior %>, <%= direccion.colonia %>, <%= direccion.ciudad %>, <%= direccion.cp %>
+                                <a href="/perfil/direcciones/modificar/<%= direccion.id_usuario %>/<%= direccion.id %>">Modificar</a>
+                                <form action="/perfil/direcciones/eliminar" method="post">
+                                    <input type="hidden" name="direccionId" value="<%= direccion.id %>">
+                                    <button type="submit" class="btn btn-primary">Eliminar</button>
+                                </form>
+                            </li>
+                        <% }) %>
+                    </ul>
+                <% } %>
             </div>
         </div>
         <%- include('footer', { currentYear: new Date().getFullYear() })%>

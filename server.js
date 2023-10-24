@@ -11,7 +11,7 @@ const bodyParser = require('body-parser') //Para poder leer los datos de formula
 
 let userRole = null //Variable para el rol del usuario
 
-app.use(session({ //Manejo de sesiones
+app.use(session( { //Manejo de sesiones
     secret: 'secreto', // Clave secreta para firmar la sesión (debería ser una cadena segura)
     resave: false, // Evita que la sesión se guarde en el almacén en cada solicitud
     saveUninitialized: false, // Evita que se cree una sesión no inicializada en la solicitud
@@ -26,13 +26,11 @@ app.use((req, res, next) => {
         // Si no ha iniciado sesión, establece un valor predeterminado (por ejemplo, "invitado")
         userRole = "invitado"
     }
-
     // Continúa con la ejecución del siguiente middleware
     next()
 })
 
-app.use(bodyParser.urlencoded({ extended: true }));
-
+app.use(bodyParser.urlencoded({ extended: true }))
 // Base de datos configuración y acceso
 const dbConfig = {
     host: 'localhost',
@@ -87,25 +85,10 @@ app.get('/', (req, res) => {
 
 //Ruta pagina conocenos
 app.get('/conocenos', (req, res) => {
-    res.locals.userRole = userRole; //Variable local para tomar el rol del usuario
+    res.locals.userRole = userRole //Variable local para tomar el rol del usuario
     res.render('conocenos', {
         pageTitle: 'Sobre nosotros',
     })
-})
-
-//Ruta para perfil
-app.get('/perfil', (req, res) => {
-    res.locals.userRole = userRole
-    if(req.session.usuario) { 
-        const user = req.session.usuario//En caso de que se encuentre la sesion, manda al perfil de la persona
-        res.render('perfil', {
-            pageTitle: 'Mi perfil',
-            user: user
-            //usuario: req.session.usuario
-        })
-    } else { //En caso de que no se haya iniciado sesion se redirecciona a la pagina de login
-        res.redirect('/login')
-    }
 })
 
 // Ruta para la página de inicio de sesión (login.ejs)
@@ -165,64 +148,120 @@ app.get('/registro', (req, res) => {
     res.locals.userRole = userRole; //Variable local para tomar el rol del usuario
     res.render('creacion', {
         pageTitle: 'Crear Cuenta',
+        userRole: userRole,
     })
 })
 
 //Agregar usuario (registro) 
 app.post('/registro', (req, res) => {
-    const nombre = req.body.nombre
-    const correo = req.body.correo
-    const contrasenia = req.body.contrasenia
-    const confirmar_contrasenia = req.body.confirmar_contrasenia
-    const tipo = "cliente"
-    
-    if (!nombre || !correo || !contrasenia || !confirmar_contrasenia || !tipo) { 
-        return res.status(400).send('Todos los campos son obligatorios.')
-    }
 
-    if (contrasenia.length < 8 || contrasenia !== confirmar_contrasenia) {
-        return res.status(400).send('La contraseña debe tener 8 caracteres (minimos) o las contraseñas no coinciden.')
-    }
-
-    try {  
-        const hash = createHash('sha256').update(contrasenia).digest('hex')
-        const sql = 'INSERT INTO users (nombre, correo, tipo, contrasenia) VALUES (?, ?, ?, ?)'
+    if(req.session.usuario && (req.session.usuario.tipo == "administrador")) {
+        const nombre = req.body.nombre
+        const correo = req.body.correo
+        const contrasenia = req.body.contrasenia
+        const confirmar_contrasenia = req.body.confirmar_contrasenia
+        const tipo = req.body.tipo
         
-        connection.query(sql, [nombre, correo, tipo, hash], (err, resultado) => { 
-            if (err) {
-                console.error('Error al registrar usuario:', err)
-                return res.status(500).send('Error interno del servidor')
-            }
-            console.log("Usuario registrado exitosamente!!!")
-            return res.redirect("/login")
-        });
-    } catch(err) {
-        console.error('Error al encriptar la contraseña:', err)
-        return res.status(500).send('Error interno del servidor')
+        if (!nombre || !correo || !contrasenia || !confirmar_contrasenia) { 
+            return res.status(400).send('Todos los campos son obligatorios.')
+        }
+
+        if (contrasenia.length < 8 || contrasenia !== confirmar_contrasenia) {
+            return res.status(400).send('La contraseña debe tener 8 caracteres (minimos) o las contraseñas no coinciden.')
+        }
+
+        try {  
+            const hash = createHash('sha256').update(contrasenia).digest('hex')
+            const sql = 'INSERT INTO users (nombre, correo, tipo, contrasenia) VALUES (?, ?, ?, ?)'
+            
+            connection.query(sql, [nombre, correo, tipo, hash], (err, resultado) => { 
+                if (err) {
+                    console.error('Error al registrar usuario:', err)
+                    return res.status(500).send('Error interno del servidor')
+                }
+                console.log("Usuario registrado exitosamente!!!")
+                return res.redirect("/login")
+            });
+        } catch(err) {
+            console.error('Error al encriptar la contraseña:', err)
+            return res.status(500).send('Error interno del servidor')
+        }
+    } else {
+        const nombre = req.body.nombre
+        const correo = req.body.correo
+        const contrasenia = req.body.contrasenia
+        const confirmar_contrasenia = req.body.confirmar_contrasenia
+        const tipo = "cliente"
+        
+        if (!nombre || !correo || !contrasenia || !confirmar_contrasenia || !tipo) { 
+            return res.status(400).send('Todos los campos son obligatorios.')
+        }
+
+        if (contrasenia.length < 8 || contrasenia !== confirmar_contrasenia) {
+            return res.status(400).send('La contraseña debe tener 8 caracteres (minimos) o las contraseñas no coinciden.')
+        }
+
+        try {  
+            const hash = createHash('sha256').update(contrasenia).digest('hex')
+            const sql = 'INSERT INTO users (nombre, correo, tipo, contrasenia) VALUES (?, ?, ?, ?)'
+            
+            connection.query(sql, [nombre, correo, tipo, hash], (err, resultado) => { 
+                if (err) {
+                    console.error('Error al registrar usuario:', err)
+                    return res.status(500).send('Error interno del servidor')
+                }
+                console.log("Usuario registrado exitosamente!!!")
+                return res.redirect("/login")
+            });
+        } catch(err) {
+            console.error('Error al encriptar la contraseña:', err)
+            return res.status(500).send('Error interno del servidor')
+        }
+    }    
+})
+
+//Ruta para perfil
+app.get('/perfil', (req, res) => {
+    res.locals.userRole = userRole
+    if(req.session.usuario) { 
+        const user = req.session.usuario //En caso de que se encuentre la sesion, manda al perfil de la persona
+        res.render('perfil', {
+            pageTitle: `Perfil de ${user.nombre}`,
+            user: user
+            //usuario: req.session.usuario
+        })
+    } else { //En caso de que no se haya iniciado sesion se redirecciona a la pagina de login
+        res.redirect('/login')
     }
 })
 
 //Metodo para modificar el perfil del usuario logeado
 app.post('/perfil/modificar', (req, res) => {
     if (req.session.usuario) {
-        const nuevoNombre = req.body.nombre // Obtén el nuevo nombre de usuario del formulario
-        // Realiza la actualización del nombre de usuario en la base de datos
-        const userId = req.session.usuario.id // Reemplaza con la propiedad correcta de tu sesión
-        const sql = 'UPDATE users SET nombre = ? WHERE id = ?'
-        connection.query(sql, [nuevoNombre, userId], (err, result) => {
-            if (err) {
-                console.error('Error al actualizar el nombre de usuario:', err)
-                res.status(500).send('Error interno del servidor')
-            } else {
-                // Actualización exitosa, redirige al usuario a su perfil con el nuevo nombre
-                console.log("Nombre de usuario actualizado exitosamente!!!")
-                req.session.usuario.nombre = nuevoNombre // Actualiza el nombre en la sesión
-                res.redirect('/perfil')
-            }
-        })
+        const nuevoNombre = req.body.nombre
+        // Verifica que el nuevoNombre no esté vacío y no contenga números
+        if (nuevoNombre && !/\d/.test(nuevoNombre)) {
+            const userId = req.session.usuario.id
+            const sql = 'UPDATE users SET nombre = ? WHERE id = ?'
+
+            connection.query(sql, [nuevoNombre, userId], (err, result) => {
+                if (err) {
+                    console.error('Error al actualizar el nombre de usuario:', err)
+                    res.status(500).send('Error interno del servidor')
+                } else {
+                    // Actualización exitosa, redirige al usuario a su perfil con el nuevo nombre
+                    console.log("Nombre de usuario actualizado exitosamente!!!")
+                    req.session.usuario.nombre = nuevoNombre // Actualiza el nombre en la sesión
+                    res.redirect('/perfil')
+                }
+            })
+        } else {
+            // El nuevo nombre está vacío o contiene números, muestra un mensaje de error
+            res.status(400).send('El nombre no es válido. Asegúrate de que no esté vacío y no contenga números.')
+        }
     } else {
         // El usuario no ha iniciado sesión, redirige a la página de inicio de sesión
-        res.redirect('/login');
+        res.redirect('/login')
     }
 })
 
@@ -412,20 +451,48 @@ app.post('/perfil/modificar/contrasenia', (req, res) => {
 // Ruta para mostrar la página de compras
 app.get('/perfil/compras', (req, res) => {
     if (req.session.usuario) {
-        //const userRole = req.session.usuario.tipo
-        res.locals.userRole = userRole
+        const userRole = req.session.usuario.tipo
         const userId = req.session.usuario.id
-        // Realiza una consulta para obtener las compras del usuario
-        const sql = 'SELECT * FROM compras WHERE id_usuario = ?'
+        // Realiza una consulta para obtener las compras y productos comprados del usuario
+        const sql = `
+        SELECT c.id AS compra_id, c.fecha_compra, p.id AS producto_id, p.nombre, p.precio, dc.cantidad_comprada, c.total
+        FROM compras c
+        JOIN detalles_compra dc ON c.id = dc.id_compra
+        JOIN productos p ON dc.id_producto = p.id
+        WHERE c.id_usuario = ?;
+        `
+
         connection.query(sql, [userId], (err, compras) => {
             if (err) {
                 console.error('Error al obtener compras:', err)
                 return res.status(500).send('Error interno del servidor')
             }
+            // Organiza los datos en una estructura adecuada para la vista
+            const comprasConProductos = []
+            let compraActual = null
+
+            for (const row of compras) {
+                if (!compraActual || compraActual.compra_id !== row.compra_id) {
+                    compraActual = {
+                        compra_id: row.compra_id,
+                        fecha_compra: row.fecha_compra,
+                        total: row.total,
+                        productos: [],
+                    }
+                    comprasConProductos.push(compraActual)
+                }
+                compraActual.productos.push({
+                    producto_id: row.producto_id,
+                    nombre: row.nombre,
+                    precio: row.precio,
+                    cantidad: row.cantidad_comprada,
+                })
+            }
 
             res.render('compras', {
                 pageTitle: 'Compras Realizadas',
-                compras: compras,
+                compras: comprasConProductos,
+                userRole: userRole
             })
         })
     } else {
@@ -548,6 +615,85 @@ app.post('/eliminarDelCarrito/:id', (req, res) => {
         res.status(403).send('Acceso no autorizado')
     }
 })
+
+// Ruta para realizar la compra con los productos en el carrito
+app.post('/realizarCompra', (req, res) => {
+    if (req.session.usuario) {
+        const userId = req.session.usuario.id;
+        // Paso 1: Crear una nueva compra en la tabla "compras"
+        connection.query('INSERT INTO compras (id_usuario, fecha_compra) VALUES (?, NOW())', [userId], (err, result) => {
+            if (err) {
+                console.error('Error al crear la compra:', err);
+                return res.status(500).send('Error interno del servidor');
+            }
+            const compraId = result.insertId; // ID de la compra recién creada
+
+            // Paso 2: Obtener los productos en el carrito del usuario, incluyendo el precio
+            connection.query('SELECT c.id_producto, c.cantidad, p.precio FROM carrito c JOIN productos p ON c.id_producto = p.id WHERE c.id_usuario = ?', [userId], (err, productosEnCarrito) => {
+                if (err) {
+                    console.error('Error al obtener productos en el carrito:', err);
+                    return res.status(500).send('Error interno del servidor');
+                }
+
+                // Paso 3: Copiar los productos del carrito a "detalles_compra" con el ID de la compra
+                const detallesCompraValues = productosEnCarrito.map(producto => [compraId, producto.id_producto, producto.cantidad]);
+                connection.query('INSERT INTO detalles_compra (id_compra, id_producto, cantidad_comprada) VALUES ?', [detallesCompraValues], (err) => {
+                    if (err) {
+                        console.error('Error al copiar los productos a detalles_compra:', err);
+                        return res.status(500).send('Error interno del servidor');
+                    }
+
+                    // Paso 4: Calcular el total de la compra
+                    const totalCompra = productosEnCarrito.reduce((total, producto) => {
+                        return total + producto.precio * producto.cantidad;
+                    }, 0);
+
+                    // Paso 5: Actualizar el total de la compra en la tabla "compras"
+                    connection.query('UPDATE compras SET total = ? WHERE id = ?', [totalCompra, compraId], (err) => {
+                        if (err) {
+                            console.error('Error al actualizar el total de la compra:', err);
+                            return res.status(500).send('Error interno del servidor');
+                        }
+
+                        // Paso 6: Actualizar el stock de productos restando la cantidad comprada y luego eliminar los productos del carrito
+                        const updateStockQueries = productosEnCarrito.map(producto => {
+                            return new Promise((resolve, reject) => {
+                                // Actualizar el stock restando la cantidad comprada
+                                connection.query('UPDATE productos SET stock = stock - ? WHERE id = ?', [producto.cantidad, producto.id_producto], (err) => {
+                                    if (err) {
+                                        console.error('Error al actualizar el stock del producto:', err);
+                                        reject(err);
+                                    } else {
+                                        resolve();
+                                    }
+                                });
+                            });
+                        });
+
+                        // Ejecutar todas las actualizaciones del stock en paralelo
+                        Promise.all(updateStockQueries)
+                            .then(() => {
+                                // Paso 7: Eliminar los productos del carrito
+                                connection.query('DELETE FROM carrito WHERE id_usuario = ?', [userId], (err) => {
+                                    if (err) {
+                                        console.error('Error al eliminar productos del carrito:', err);
+                                        return res.status(500).send('Error interno del servidor');
+                                    }
+                                    // Paso 8: Redirigir al usuario a una página de confirmación o recibo
+                                    res.redirect('/perfil/compras');
+                                });
+                            })
+                            .catch((err) => {
+                                return res.status(500).send('Error interno del servidor');
+                            });
+                    });
+                });
+            });
+        });
+    } else {
+        res.status(403).send('Acceso no autorizado');
+    }
+});
 
 // Ruta para los productos
 app.get('/productos', (req, res) => {

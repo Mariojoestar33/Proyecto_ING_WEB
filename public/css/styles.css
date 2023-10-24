@@ -450,8 +450,30 @@ footer {
 .carritoVista {
     display: grid;
     grid-template-columns: 500px auto;
+    justify-content: space-around;
 }
 
 .carritoVista > img {
     width: 200px;
+}
+
+.carritoVista > li {
+    list-style: none;
+}
+
+.listaProductosComprados{
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+}
+
+.si {
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+}
+
+.productos-comprados > p {
+    border: #000000 2px solid;
+    margin: 0px;
 }

@@ -16,23 +16,29 @@
                 </ul>
             </div>
             <div>
-                <h2>Compras Realizadas</h2>
-                <ul>
-                    <% compras.forEach((compra) => { %>
-                        <li>
-                            <button class="compra-button" data-compra-id="<%= compra.id %>">
-                                Fecha de compra: <%= compra.fecha_compra %>
-                            </button>
-                            <div class="productos-comprados" id="productos-comprados-<%= compra.id %>">
-                                <!-- Aquí se mostrarán los productos comprados de esta compra -->
-                                <% compra.productos.forEach((producto) => { %>
-                                    <!-- Muestra detalles del producto, como nombre, cantidad, etc. -->
-                                    Nombre del producto: <%= producto.nombre %>, Cantidad: <%= producto.cantidad %>
-                                <% }) %>
-                            </div>
-                        </li>
-                    <% }) %>
-                </ul>
+                <h2>Compras Realizadas (<%= compras.length%>)</h2>
+                <br>
+                <% if (compras.length <= 0) { %>
+                    <h5>Sin compras realizadas</h5>
+                <% } else { %>
+                    <ul class="si">
+                        <% compras.forEach((compra) => { %>
+                            <li class="listaProductosComprados">
+                                <button class="compra-button" data-compra-id="<%= compra.id %>">
+                                    Compra realizada: <%= compra.fecha_compra %>
+                                </button>
+                                <div class="productos-comprados" id="productos-comprados-<%= compra.id %>">
+                                    <!-- Aquí se mostrarán los productos comprados de esta compra -->
+                                    <% compra.productos.forEach((producto) => { %>
+                                        <!-- Muestra detalles del producto, como nombre, cantidad, etc. -->
+                                       <p> Producto: <%= producto.nombre %> <br> Cantidad: <%= producto.cantidad %></p>
+                                    <% }) %>
+                                    <h4 style="text-align:center;">Total $<%= compra.total %></h4>
+                                </div>
+                            </li>
+                        <% }) %>
+                    </ul>
+                <% } %>
             </div>
         </div>
         <%- include('footer', { currentYear: new Date().getFullYear() }) %>

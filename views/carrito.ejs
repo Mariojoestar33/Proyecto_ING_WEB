@@ -6,7 +6,8 @@
             <%- include('navbar') %>
         </header>
         <div class="container">
-            <h1>Carrito de Compras</h1>
+            <h1 class="titulo">Carrito de Compras</h1>
+            <br>
             <ul>
                 <% carrito.forEach(producto => { %>
                     <div class="carritoVista">
@@ -31,6 +32,7 @@
                     <br>
                 <% }) %>
             </ul>
+
             <% if (carrito.length > 0) { %>
                 <form action="/realizarCompra" method="post" class="formulario">
                     <button type="submit" class="btn btn-primary">Realizar Compra</button>

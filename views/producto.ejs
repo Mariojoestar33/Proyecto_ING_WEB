@@ -10,8 +10,12 @@
                 <h1 class="titulo"><%= product.nombre %></h1>
                 <img class="imagenproducto" src="../<%= product.imagen %>" alt="<%= product.nombre %>">
                 <p><%= product.descripcion %></p>
-                <p>Stock: <%= product.stock %></p>
-                <% if (userRole == "cliente") { %>
+                <% if (product.stock <= 0) { %>
+                 <p>Sin stock disponible</p>
+                <% } else { %>
+                    <p>Stock: <%= product.stock %></p>
+                    <% } %>
+                <% if (userRole == "cliente" && product.stock > 0) { %>
                     <form action="/agregarAlCarrito" method="post">
                         <input type="hidden" name="productId" value="<%= product.id %>">
                         <label for="cantidad">Cantidad:</label>

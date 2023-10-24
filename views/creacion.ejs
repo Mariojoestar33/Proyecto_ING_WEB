@@ -27,7 +27,17 @@
                 <label for="exampleInputPassword1">Confirmar Password</label>
                 <input type="password" class="form-control" id="confirmar_contrasenia" name="confirmar_contrasenia" placeholder="Password">
             </div>
-            </br>
+            <!-- Selector de tipo de usuario solo para administradores -->
+            <% if (userRole === 'administrador') { %>
+              <div class="form-group">
+                  <label for="exampleInputType">Tipo de Usuario</label>
+                  <select class="form-control" id="tipo" name="tipo">
+                      <option value="administrador">Administrador</option>
+                      <option value="editor">Editor</option>
+                      <option value="cliente">Cliente</option>
+                  </select>
+              </div>
+            <% } %>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
         <p style="text-align: center;"><a class="link-opacity-75" href="/login">Ya tienes una cuenta?</a></p>

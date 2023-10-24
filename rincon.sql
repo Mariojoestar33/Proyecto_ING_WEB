@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.1.1
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 24-10-2023 a las 03:32:56
--- Versión del servidor: 8.0.31
--- Versión de PHP: 8.0.26
+-- Tiempo de generación: 24-10-2023 a las 20:20:50
+-- Versión del servidor: 5.7.36
+-- Versión de PHP: 7.4.26
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -29,22 +29,15 @@ SET time_zone = "+00:00";
 
 DROP TABLE IF EXISTS `carrito`;
 CREATE TABLE IF NOT EXISTS `carrito` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `id_usuario` int NOT NULL,
-  `id_producto` int NOT NULL,
-  `cantidad` int NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_usuario` int(11) NOT NULL,
+  `id_producto` int(11) NOT NULL,
+  `cantidad` int(11) NOT NULL,
   `fecha_creacion` timestamp NOT NULL,
   PRIMARY KEY (`id`),
   KEY `id_usuario` (`id_usuario`),
   KEY `id_producto` (`id_producto`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Volcado de datos para la tabla `carrito`
---
-
-INSERT INTO `carrito` (`id`, `id_usuario`, `id_producto`, `cantidad`, `fecha_creacion`) VALUES
-(1, 21, 1, 20, '2023-10-24 02:46:24');
+) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -54,12 +47,20 @@ INSERT INTO `carrito` (`id`, `id_usuario`, `id_producto`, `cantidad`, `fecha_cre
 
 DROP TABLE IF EXISTS `compras`;
 CREATE TABLE IF NOT EXISTS `compras` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `id_usuario` int DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_usuario` int(11) DEFAULT NULL,
   `fecha_compra` date DEFAULT NULL,
+  `total` decimal(10,2) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_usuario` (`id_usuario`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `compras`
+--
+
+INSERT INTO `compras` (`id`, `id_usuario`, `fecha_compra`, `total`) VALUES
+(7, 21, '2023-10-24', '148.50');
 
 -- --------------------------------------------------------
 
@@ -69,14 +70,22 @@ CREATE TABLE IF NOT EXISTS `compras` (
 
 DROP TABLE IF EXISTS `detalles_compra`;
 CREATE TABLE IF NOT EXISTS `detalles_compra` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `id_compra` int DEFAULT NULL,
-  `id_producto` int DEFAULT NULL,
-  `cantidad_comprada` int DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_compra` int(11) DEFAULT NULL,
+  `id_producto` int(11) DEFAULT NULL,
+  `cantidad_comprada` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_compra` (`id_compra`),
   KEY `id_producto` (`id_producto`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `detalles_compra`
+--
+
+INSERT INTO `detalles_compra` (`id`, `id_compra`, `id_producto`, `cantidad_comprada`) VALUES
+(8, 7, 14, 13),
+(9, 7, 4, 8);
 
 -- --------------------------------------------------------
 
@@ -86,8 +95,8 @@ CREATE TABLE IF NOT EXISTS `detalles_compra` (
 
 DROP TABLE IF EXISTS `direcciones`;
 CREATE TABLE IF NOT EXISTS `direcciones` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `id_usuario` int DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_usuario` int(11) DEFAULT NULL,
   `calle` varchar(64) DEFAULT NULL,
   `numero_exterior` varchar(10) DEFAULT NULL,
   `ciudad` varchar(64) DEFAULT NULL,
@@ -95,7 +104,7 @@ CREATE TABLE IF NOT EXISTS `direcciones` (
   `colonia` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_usuario` (`id_usuario`)
-) ENGINE=MyISAM AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=19 DEFAULT CHARSET=latin1;
 
 --
 -- Volcado de datos para la tabla `direcciones`
@@ -127,28 +136,28 @@ INSERT INTO `direcciones` (`id`, `id_usuario`, `calle`, `numero_exterior`, `ciud
 
 DROP TABLE IF EXISTS `productos`;
 CREATE TABLE IF NOT EXISTS `productos` (
-  `id` int NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(64) DEFAULT NULL,
   `categoria` varchar(64) DEFAULT NULL,
-  `stock` int DEFAULT NULL,
+  `stock` int(11) DEFAULT NULL,
   `descripcion` varchar(64) DEFAULT NULL,
   `imagen` varchar(255) DEFAULT NULL,
   `precio` decimal(10,2) DEFAULT NULL,
   `marca` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=21 DEFAULT CHARSET=latin1;
 
 --
 -- Volcado de datos para la tabla `productos`
 --
 
 INSERT INTO `productos` (`id`, `nombre`, `categoria`, `stock`, `descripcion`, `imagen`, `precio`, `marca`) VALUES
-(1, 'Cuaderno Scribe rojo', 'Papel', 55, 'Cuaderno profesional de cuadro chico con 200 hojas.', 'images/papel/cuaderno_1.jpg', '45.00', 'Scribe'),
-(2, 'Papel bond 1', 'Papel', 100, 'Papel bond de 200mm', 'images/papel/bond_1.jpg', '50.00', 'Scribe'),
-(3, 'Bloc de notas 1', 'Papel', 75, 'Block de 200 hojas', 'images/papel/block_1.jpg', '25.00', 'Barril'),
-(4, 'Bolígrafo 1', 'Escritura', 200, 'Bolígrafo negro de 0.02mm', 'images/escritura/boligrafo_1.jpg', '8.00', 'Paper Mate'),
+(1, 'Cuaderno Scribe rojo', 'Papel', 45, 'Cuaderno profesional de cuadro chico con 200 hojas.', 'images/papel/cuaderno_1.jpg', '45.00', 'Scribe'),
+(2, 'Papel bond 1', 'Papel', 50, 'Papel bond de 200mm', 'images/papel/bond_1.jpg', '50.00', 'Scribe'),
+(3, 'Bloc de notas 1', 'Papel', 74, 'Block de 200 hojas', 'images/papel/block_1.jpg', '25.00', 'Barril'),
+(4, 'Bolígrafo 1', 'Escritura', 192, 'Bolígrafo negro de 0.02mm', 'images/escritura/boligrafo_1.jpg', '8.00', 'Paper Mate'),
 (5, 'Lápiz 1', 'Escritura', 150, 'Lápiz de grafito', 'images/escritura/lapiz_1.jpg', '5.00', 'Bond'),
-(6, 'Pegamento 1', 'Adhesivos', 30, 'Lápiz adhesivo', 'images/adhesivos/lapiz_1.jpg', '14.50', 'Barol'),
+(6, 'Pegamento 1', 'Adhesivos', 0, 'Lápiz adhesivo', 'images/adhesivos/lapiz_1.jpg', '14.50', 'Barol'),
 (7, 'Tijeras 1', 'Herramientas', 20, 'Tijeras para niños', 'images/herramientas/tijeras_1.jpg', '20.00', 'Barrilito'),
 (8, 'Goma de borrar 1', 'Escritura', 80, 'Goma para borrar de pan.', 'images/escritura/goma_1.jpg', '6.00', 'Scribe'),
 (9, 'Cinta adhesiva 1', 'Adhesivos', 40, 'Cinta adhesiva de 40 metros.', 'images/adhesivos/cinta_1.jpg', '13.00', 'Borax'),
@@ -156,7 +165,7 @@ INSERT INTO `productos` (`id`, `nombre`, `categoria`, `stock`, `descripcion`, `i
 (11, 'Cuaderno 2', 'Papel', 45, 'Cuaderno profesional de 100 hojas cuadro grande.', 'images/papel/cuaderno_2.jpg', '95.00', 'Scribe'),
 (12, 'Papel bond 2', 'Papel', 90, 'Papel bond amarillo', 'images/papel/bond_2.jpg', '15.00', 'Bond'),
 (13, 'Bloc de notas 2', 'Papel', 70, 'Block de notas de 50 hojas cuadro grande.', 'images/papel/block_2.jpg', '67.00', 'Norma'),
-(14, 'Bolígrafo 2', 'Escritura', 180, 'Bolígrafo negro de 0.04mm.', 'images/escritura/boligrafo_2.jpg', '6.50', 'Paper Mate'),
+(14, 'Bolígrafo 2', 'Escritura', 167, 'Bolígrafo negro de 0.04mm.', 'images/escritura/boligrafo_2.jpg', '6.50', 'Paper Mate'),
 (15, 'Lápiz 2', 'Escritura', 140, 'Lápiz de color rojo.', 'images/escritura/lapiz_2.jpg', '5.00', 'Scribe'),
 (19, 'Papel día de Muertos', 'Papel', 100, 'Papel mache con temática de día de muertos.', 'images/Papel/papel-día-de-muertos.jpg', '45.00', 'Norma'),
 (20, 'Libreta forma francesa', 'Papel', 20, 'Libreta Scribbe con forma francesa y rayas de 100 hojas.', 'images/Papel/libreta-forma-francesa.jpg', '98.00', 'Scribe'),
@@ -170,14 +179,14 @@ INSERT INTO `productos` (`id`, `nombre`, `categoria`, `stock`, `descripcion`, `i
 
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
-  `id` int NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(64) DEFAULT NULL,
   `correo` varchar(64) DEFAULT NULL,
   `tipo` enum('administrador','editor','cliente') DEFAULT NULL,
   `contrasenia` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `correo` (`correo`)
-) ENGINE=MyISAM AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=26 DEFAULT CHARSET=latin1;
 
 --
 -- Volcado de datos para la tabla `users`
@@ -199,7 +208,10 @@ INSERT INTO `users` (`id`, `nombre`, `correo`, `tipo`, `contrasenia`) VALUES
 (14, 'Isabel', 'isabel@example.com', 'cliente', 'hash14'),
 (15, 'Antonio', 'antonio@example.com', 'cliente', 'hash15'),
 (18, 'Jorge', 'raiden12@gmail.com', 'editor', 'a2a816e9eff8ef8eb22aa464879ee3a51f7fe9757a6a3a1fa012bed349b2c258'),
-(21, 'Tania Soto Hernandez', 'tann07lee04@gmail.com', 'cliente', '9df7d62dbc19dc31d1a11e7e9fe399babedfba0473235452fa1d357b9dddaf3c');
+(21, 'Tania', 'tann07lee04@gmail.com', 'cliente', '9df7d62dbc19dc31d1a11e7e9fe399babedfba0473235452fa1d357b9dddaf3c'),
+(22, 'Kakas', 'masdk@hotmail.com', 'cliente', 'a2a816e9eff8ef8eb22aa464879ee3a51f7fe9757a6a3a1fa012bed349b2c258'),
+(23, 'Luis Barreras', 'lksldk@gmail.com', 'cliente', 'a2a816e9eff8ef8eb22aa464879ee3a51f7fe9757a6a3a1fa012bed349b2c258'),
+(25, 'lasklaslk', 'cxhagsd@gmail.com', 'editor', 'a2a816e9eff8ef8eb22aa464879ee3a51f7fe9757a6a3a1fa012bed349b2c258');
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
