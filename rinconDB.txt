@@ -10,6 +10,17 @@ CREATE TABLE IF NOT EXISTS `compras` (
   KEY `id_usuario` (`id_usuario`)
 );
 
+DROP TABLE IF EXISTS carrito;
+CREATE TABLE IF NOT EXISTS carrito (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  id_usuario INT NOT NULL,
+  id_producto INT NOT NULL,
+  cantidad INT NOT NULL,
+  fecha_creacion TIMESTAMP NOT NULL,
+  FOREIGN KEY (id_usuario) REFERENCES users(id),  -- Referencia al usuario
+  FOREIGN KEY (id_producto) REFERENCES productos(id)  -- Referencia al producto
+);
+
 DROP TABLE IF EXISTS `direcciones`;
 CREATE TABLE IF NOT EXISTS `direcciones` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -74,8 +85,8 @@ INSERT INTO `productos` (`id`, `nombre`, `categoria`, `stock`, `descripcion`, `i
 (20, 'Libreta forma francesa', 'Papel', 20, 'Libreta Scribbe con forma francesa y rayas de 100 hojas.', 'images/Papel/libreta-forma-francesa.jpg', '98.00', 'Scribe'),
 (18, 'Tijeras 3', 'Herramientas', 2, 'Si', 'images/Herramientas/tijeras-3.jpg', '24.00', 'Borax');
 
-DROP TABLE IF EXISTS `productos_compras`;
-CREATE TABLE IF NOT EXISTS `productos_compras` (
+DROP TABLE IF EXISTS 'detalles_compra';
+CREATE TABLE IF NOT EXISTS `detalles_compra` (
   `id` int NOT NULL AUTO_INCREMENT,
   `id_compra` int DEFAULT NULL,
   `id_producto` int DEFAULT NULL,

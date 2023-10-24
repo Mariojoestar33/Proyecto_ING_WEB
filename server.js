@@ -454,12 +454,16 @@ app.post('/perfil/compras/mostrarProductos', (req, res) => {
     }
 })
 
-// Ruta GET para mostrar el carrito de compras
+// Ruta para mostrar el carrito de compras
 app.get('/carrito', (req, res) => {
     if (req.session.usuario) {
+        res.locals.userRole = userRole
         const userId = req.session.usuario.id
         // Realiza una consulta para obtener los productos en el carrito del usuario
-        const sql = `SELECT p.id, p.nombre, p.descripcion, p.precio, pc.cantidad_comprada FROM productos_compras pc JOIN productos p ON pc.id_producto = p.id WHERE pc.id_usuario = ?`
+        const sql = `SELECT p.id, p.nombre, p.descripcion, p.precio, p.imagen, p.stock, c.cantidad
+        FROM carrito c
+        JOIN productos p ON c.id_producto = p.id
+        WHERE c.id_usuario = ?;`
 
         connection.query(sql, [userId], (err, productosEnCarrito) => {
             if (err) {
@@ -468,8 +472,77 @@ app.get('/carrito', (req, res) => {
             }
             // Renderiza la página del carrito y pasa los productos al template
             res.render('carrito', {
-                productos: productosEnCarrito
+                pageTitle: 'Carrito de Compras',
+                carrito: productosEnCarrito
             })
+        })
+    } else {
+        res.status(403).send('Acceso no autorizado')
+    }
+})
+
+//Ruta para agregar al carrito de compras
+app.post('/agregarAlCarrito', (req, res) => {
+    if (req.session.usuario) {
+        const userId = req.session.usuario.id
+        const productId = req.body.productId // Suponiendo que tienes un campo en el formulario con el ID del producto
+        const cantidad = req.body.cantidad // Suponiendo que tienes un campo en el formulario para la cantidad
+
+        // Insertar el producto en la tabla "carrito"
+        const sql = `INSERT INTO carrito (id_usuario, id_producto, cantidad, fecha_creacion) VALUES (?, ?, ?, NOW())`
+
+        connection.query(sql, [userId, productId, cantidad], (err) => {
+            if (err) {
+                console.error('Error al agregar el producto al carrito:', err)
+                return res.status(500).send('Error interno del servidor')
+            }
+            // Redirige al usuario a la página del producto u otra página de confirmación
+            console.log("Producto agregado al carrito exitosamente!!!")
+            res.redirect('/carrito')
+        })
+    } else {
+        res.status(403).send('Acceso no autorizado')
+    }
+})
+
+//Ruta para actualizar la cantidad de productos en el carrito
+app.post('/actualizarCantidadEnCarrito/:id', (req, res) => {
+    if (req.session.usuario) {
+        const userId = req.session.usuario.id
+        const productoId = req.params.id
+        const nuevaCantidad = req.body.cantidad // Asegúrate de que el nombre del campo en el formulario sea 'cantidad'
+        // Realiza la actualización de la cantidad en la tabla 'carrito'
+        const sql = 'UPDATE carrito SET cantidad = ? WHERE id_usuario = ? AND id_producto = ?'
+
+        connection.query(sql, [nuevaCantidad, userId, productoId], (err, result) => {
+            if (err) {
+                console.error('Error al actualizar la cantidad en el carrito:', err)
+                return res.status(500).send('Error interno del servidor')
+            }
+            // Redirecciona de nuevo al carrito
+            res.redirect('/carrito')
+        })
+    } else {
+        res.status(403).send('Acceso no autorizado')
+    }
+})
+
+//Ruta para eliminar el producto del carrito
+app.post('/eliminarDelCarrito/:id', (req, res) => {
+    if (req.session.usuario) {
+        const userId = req.session.usuario.id
+        const productoId = req.params.id
+        // Realiza la eliminación del producto del carrito
+        const sql = 'DELETE FROM carrito WHERE id_usuario = ? AND id_producto = ?'
+
+        connection.query(sql, [userId, productoId], (err, result) => {
+            if (err) {
+                console.error('Error al eliminar el producto del carrito:', err)
+                return res.status(500).send('Error interno del servidor')
+            }
+
+            // Redirecciona de nuevo al carrito
+            res.redirect('/carrito')
         })
     } else {
         res.status(403).send('Acceso no autorizado')

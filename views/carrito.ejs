@@ -1,15 +1,44 @@
-<!-- carrito.ejs -->
-<h1>Carrito de Compras</h1>
-<ul>
-    <% carrito.forEach(producto => { %>
-        <li>
-            Producto: <%= producto.nombre %><br>
-            Descripción: <%= producto.descripcion %><br>
-            Cantidad: <%= producto.cantidad %><br>
-            Precio unitario: <%= producto.precio %><br>
-            Subtotal: <%= producto.precio * producto.cantidad %><br>
-            <a href="/eliminarDelCarrito/<%= producto.id %>">Eliminar del Carrito</a><br>
-        </li>
-    <% }) %>
-</ul>
-<a href="/realizarCompra">Realizar Compra</a>
+<!DOCTYPE html>
+<html lang="es">
+<%- include('head') %>
+    <body>
+        <header>
+            <%- include('navbar') %>
+        </header>
+        <div class="container">
+            <h1>Carrito de Compras</h1>
+            <ul>
+                <% carrito.forEach(producto => { %>
+                    <div class="carritoVista">
+                        <li>
+                            Producto: <%= producto.nombre %><br>
+                            <form action="/actualizarCantidadEnCarrito/<%= producto.id %>" method="post">
+                                Cantidad: <select name="cantidad">
+                                    <% for (let i = 1; i <= producto.stock; i++) { %>
+                                        <option value="<%= i %>"<%= i === producto.cantidad ? ' selected' : '' %>><%= i %></option>
+                                    <% } %>
+                                </select>
+                                <button type="submit" class="btn btn-primary">Actualizar Cantidad</button>
+                            </form>
+                            Precio unitario: <%= producto.precio %><br>
+                            Subtotal: <%= producto.precio * producto.cantidad %><br>
+                            <form action="/eliminarDelCarrito/<%= producto.id %>" method="post">
+                                <button type="submit" class="btn btn-danger">Eliminar del Carrito</button>
+                            </form>
+                        </li>
+                        <img src="<%= producto.imagen %>" alt="Carrito">
+                    </div>
+                    <br>
+                <% }) %>
+            </ul>
+            <% if (carrito.length > 0) { %>
+                <form action="/realizarCompra" method="post" class="formulario">
+                    <button type="submit" class="btn btn-primary">Realizar Compra</button>
+                </form>
+            <% } else { %>
+                <p style="text-align: center;">No hay nada en el carrito</p>
+            <% } %>
+        </div>
+        <%- include('footer', { currentYear: new Date().getFullYear() }) %>
+    </body>
+</html>

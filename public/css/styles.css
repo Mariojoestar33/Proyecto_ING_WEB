@@ -446,3 +446,12 @@ footer {
 #containerConocenos {
     margin-left: 0px;
 }
+
+.carritoVista {
+    display: grid;
+    grid-template-columns: 500px auto;
+}
+
+.carritoVista > img {
+    width: 200px;
+}
