@@ -9,19 +9,13 @@
         <!--End of Navbar-->
         <!--Creacion de cuenta-->
         <h1 class="titulo">Iniciar sesion</h1>
-         <!-- Mostrar mensaje de alerta si se detecta un error -->
-         <h1><%= falla %></h1>
-        <% if (falla == "?error=invalid") { %>
-            <div class="alert alert-danger">
-                Contraseña incorrecta. Intente de nuevo.
-            </div>
-        <% } else if (falla == "?error=notfound") { %>
-            <div class="alert alert-danger">
-                No se detecta ninguna cuenta asociada al correo.
-            </div>
-        <% } %>
         <form class="formulario" method="POST" action="/login">
             <div class="form-group">
+                <% if (pageTitle == error) { %>
+                    <div class="alert alert-danger" style="text-align: center;">
+                        Error al iniciar sesion, contraseña o correo incorrecto. <br>
+                    </div>
+                <% } %>
               <label for="exampleInputEmail1">Correo Electronico</label>
               <input type="email" class="form-control" id="correo" name="correo" aria-describedby="emailHelp" placeholder="tuCorreo@gmail.com">
             </div>

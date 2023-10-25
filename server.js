@@ -98,17 +98,7 @@ app.get('/login', (req, res) => {
     res.locals.userRole = userRole; //Variable local para tomar el rol del usuario
     res.render('login', {
         pageTitle: 'Iniciar Sesión',
-        falla: null,
-    })
-})
-
-// Ruta para la página de inicio de sesión (login.ejs) cuando se det4ecta un error en el manejo de la sesion   
-app.get('/login/:falla', (req, res) => {
-    res.locals.userRole = userRole; //Variable local para tomar el rol del usuario
-    const falla = req.params.error //Variable de parametro de error
-    res.render('login', {
-        pageTitle: 'Iniciar Sesión',
-        falla: falla,
+        error: null,
     })
 })
 
@@ -116,6 +106,7 @@ app.get('/login/:falla', (req, res) => {
 app.post('/login', (req, res) => {
     const correo = req.body.correo
     const contrasenia = req.body.contrasenia
+    res.locals.userRole = userRole
     // Buscar el usuario por correo en la base de datos
     const sql = 'SELECT * FROM users WHERE correo = ?'
     connection.query(sql, [correo], (err, results) => {
@@ -133,11 +124,25 @@ app.post('/login', (req, res) => {
                 res.redirect('/') // Redirigir a pagina principal del usuario
             } else {
                 console.log('Contraseña incorrecta:', contrasenia)
-                res.redirect('/login/?error=invalid') // Contraseña incorrecta
+                res.locals.error = 'Contraseña incorrecta';
+                res.render('login', { 
+                    pageTitle: 'Contraseña incorrecta',
+                    error: 'Contraseña incorrecta',
+                    userRole: userRole 
+                });
+                //console.log('Contraseña incorrecta:', contrasenia)
+                //res.redirect('/login/?error=invalid') // Contraseña incorrecta
             }
         } else {
-            console.log('Correo electrónico no encontrado:', correo)
-            res.redirect('/login/?error=notfound') // Correo electrónico no encontrado
+            console.log('Correo electrónico no encontrado:', correo);
+            res.locals.error = 'Correo electrónico no encontrado';
+            res.render('login', { 
+                pageTitle: 'Correo no encontrado',
+                error: 'Correo no encontrado',
+                userRole: userRole,
+             })
+            //console.log('Correo electrónico no encontrado:', correo)
+            //res.redirect('/login/?error=notfound') // Correo electrónico no encontrado
         }
     })
 })
