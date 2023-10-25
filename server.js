@@ -98,6 +98,17 @@ app.get('/login', (req, res) => {
     res.locals.userRole = userRole; //Variable local para tomar el rol del usuario
     res.render('login', {
         pageTitle: 'Iniciar Sesión',
+        falla: null,
+    })
+})
+
+// Ruta para la página de inicio de sesión (login.ejs) cuando se det4ecta un error en el manejo de la sesion   
+app.get('/login/:falla', (req, res) => {
+    res.locals.userRole = userRole; //Variable local para tomar el rol del usuario
+    const falla = req.params.error //Variable de parametro de error
+    res.render('login', {
+        pageTitle: 'Iniciar Sesión',
+        falla: falla,
     })
 })
 
@@ -122,11 +133,11 @@ app.post('/login', (req, res) => {
                 res.redirect('/') // Redirigir a pagina principal del usuario
             } else {
                 console.log('Contraseña incorrecta:', contrasenia)
-                res.redirect('/login') // Contraseña incorrecta
+                res.redirect('/login/?error=invalid') // Contraseña incorrecta
             }
         } else {
             console.log('Correo electrónico no encontrado:', correo)
-            res.redirect('/login') // Correo electrónico no encontrado
+            res.redirect('/login/?error=notfound') // Correo electrónico no encontrado
         }
     })
 })
