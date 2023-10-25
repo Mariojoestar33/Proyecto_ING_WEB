@@ -17,7 +17,7 @@
             <%- include('navbar') %>
         </header>
         <div class="container">
-            <h1 class="titulo">Productos</h1>
+            <h1 class="titulo">Productos<% if(userRole == "administrador" || userRole == "editor") { %> totales (<%= products.length %>)<% } %></h1>
             <br>
             <div class="row">
                 <% products.forEach((product) => { %>

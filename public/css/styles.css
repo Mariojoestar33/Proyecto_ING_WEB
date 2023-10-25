@@ -319,7 +319,7 @@ footer {
 .conocenos {
     margin: 100px;
     display: grid;
-    grid-template-columns: 500px auto;
+    grid-template-columns: 500px 1200px;
 }
 
 .subcontainer {

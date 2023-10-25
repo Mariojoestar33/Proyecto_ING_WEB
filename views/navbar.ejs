@@ -21,7 +21,12 @@
                 <li><a href="/registro">Agregar usuario</a></li>
             </ul>
         </li>
-        <li><a href="/cerrar">Cerrar Sesion</a></li>
+        <li class="activadorSub"><a href="/perfil"><%= userName %></a>
+            <ul class="submenu">
+                <li><a href="/cerrar">Cerrar Sesion</a></li>
+            </ul>
+        </li>
+        
         <% } else if(userRole == "invitado") { %>
         <li><a href="/productos">Papeleria</a></li>
         <li><a href="/login">Login</a></li>

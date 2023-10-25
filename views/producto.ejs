@@ -27,6 +27,9 @@
                         <button type="submit" class="btn btn-primary">Agregar al Carrito</button>
                     </form>
                 <% } %>
+                <% if (userRole == "invitado") { %>
+                    <a href="/login" class="btn btn-primary" style="width: 100px; margin: 0 auto;">Comprar</a>
+                <% } %>
             </div>
         </div>
         <%- include('footer', { currentYear: new Date().getFullYear() }) %>
