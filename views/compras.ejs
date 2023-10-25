@@ -31,7 +31,7 @@
                                     <!-- Aquí se mostrarán los productos comprados de esta compra -->
                                     <% compra.productos.forEach((producto) => { %>
                                         <!-- Muestra detalles del producto, como nombre, cantidad, etc. -->
-                                       <p> Producto: <%= producto.nombre %> <br> Cantidad: <%= producto.cantidad %></p>
+                                       <p> Producto: <%= producto.nombre %> <br> Precio: $<%= producto.precio %> <br> Cantidad: <%= producto.cantidad %> <br> Subtotal: $<%= producto.cantidad * producto.precio %> </p>
                                     <% }) %>
                                     <h4 style="text-align:center;">Total $<%= compra.total %></h4>
                                 </div>

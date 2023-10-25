@@ -11,8 +11,10 @@ const bodyParser = require('body-parser') //Para poder leer los datos de formula
 
 let userRole = null //Variable para el rol del usuario
 
+app.set('trust proxy', 1) // trust first proxy
+
 app.use(session( { //Manejo de sesiones
-    secret: 'secreto', // Clave secreta para firmar la sesión (debería ser una cadena segura)
+    secret: 'S3CR3T', // Clave secreta para firmar la sesión (debería ser una cadena segura)
     resave: false, // Evita que la sesión se guarde en el almacén en cada solicitud
     saveUninitialized: false, // Evita que se cree una sesión no inicializada en la solicitud
 }))
@@ -103,7 +105,6 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res) => {
     const correo = req.body.correo
     const contrasenia = req.body.contrasenia
-
     // Buscar el usuario por correo en la base de datos
     const sql = 'SELECT * FROM users WHERE correo = ?'
     connection.query(sql, [correo], (err, results) => {
@@ -154,22 +155,18 @@ app.get('/registro', (req, res) => {
 
 //Agregar usuario (registro) 
 app.post('/registro', (req, res) => {
-
     if(req.session.usuario && (req.session.usuario.tipo == "administrador")) {
         const nombre = req.body.nombre
         const correo = req.body.correo
         const contrasenia = req.body.contrasenia
         const confirmar_contrasenia = req.body.confirmar_contrasenia
         const tipo = req.body.tipo
-        
         if (!nombre || !correo || !contrasenia || !confirmar_contrasenia) { 
             return res.status(400).send('Todos los campos son obligatorios.')
         }
-
         if (contrasenia.length < 8 || contrasenia !== confirmar_contrasenia) {
             return res.status(400).send('La contraseña debe tener 8 caracteres (minimos) o las contraseñas no coinciden.')
         }
-
         try {  
             const hash = createHash('sha256').update(contrasenia).digest('hex')
             const sql = 'INSERT INTO users (nombre, correo, tipo, contrasenia) VALUES (?, ?, ?, ?)'
@@ -181,7 +178,7 @@ app.post('/registro', (req, res) => {
                 }
                 console.log("Usuario registrado exitosamente!!!")
                 return res.redirect("/login")
-            });
+            })
         } catch(err) {
             console.error('Error al encriptar la contraseña:', err)
             return res.status(500).send('Error interno del servidor')
@@ -192,15 +189,12 @@ app.post('/registro', (req, res) => {
         const contrasenia = req.body.contrasenia
         const confirmar_contrasenia = req.body.confirmar_contrasenia
         const tipo = "cliente"
-        
         if (!nombre || !correo || !contrasenia || !confirmar_contrasenia || !tipo) { 
             return res.status(400).send('Todos los campos son obligatorios.')
         }
-
         if (contrasenia.length < 8 || contrasenia !== confirmar_contrasenia) {
             return res.status(400).send('La contraseña debe tener 8 caracteres (minimos) o las contraseñas no coinciden.')
         }
-
         try {  
             const hash = createHash('sha256').update(contrasenia).digest('hex')
             const sql = 'INSERT INTO users (nombre, correo, tipo, contrasenia) VALUES (?, ?, ?, ?)'
@@ -212,7 +206,7 @@ app.post('/registro', (req, res) => {
                 }
                 console.log("Usuario registrado exitosamente!!!")
                 return res.redirect("/login")
-            });
+            })
         } catch(err) {
             console.error('Error al encriptar la contraseña:', err)
             return res.status(500).send('Error interno del servidor')
