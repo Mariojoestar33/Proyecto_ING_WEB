@@ -21,8 +21,8 @@
                                 </select>
                                 <button type="submit" class="btn btn-primary">Actualizar Cantidad</button>
                             </form>
-                            Precio unitario: <%= producto.precio %><br>
-                            Subtotal: <%= producto.precio * producto.cantidad %><br>
+                            Precio unitario: $<%= producto.precio %><br>
+                            Subtotal: $<%= producto.precio * producto.cantidad %><br>
                             <form action="/eliminarDelCarrito/<%= producto.id %>" method="post">
                                 <button type="submit" class="btn btn-danger">Eliminar del Carrito</button>
                             </form>
