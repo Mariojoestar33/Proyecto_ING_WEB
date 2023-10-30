@@ -53,16 +53,12 @@ connection.connect((err) => {
 
 module.exports = connection
 // Fin de bd
-
 // Configurar EJS como motor de plantillas
 app.set('view engine', 'ejs')
-
 // Establecer la ubicación de las plantillas EJS
 app.set('views', path.join(__dirname, 'views'))
-
 // Middleware para servir archivos estáticos (como CSS, imágenes, etc.)
 app.use(express.static(path.join(__dirname, 'public')))
-
 // Configurar multer para manejar la carga de archivos
 const uploadDirectory = 'public/images'
 
