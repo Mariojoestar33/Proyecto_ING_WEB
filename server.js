@@ -9,12 +9,14 @@ const app = express()
 const { createHash } = require('crypto') //Encriptacion
 const bodyParser = require('body-parser') //Para poder leer los datos de formularios
 
+require("dotenv").config() //Se añade el archivo de configuracion de datos para privacidad
+
 let userRole = null //Variable para el rol del usuario
 
 app.set('trust proxy', 1) // trust first proxy
 
 app.use(session( { //Manejo de sesiones
-    secret: 'S3CR3T', // Clave secreta para firmar la sesión (debería ser una cadena segura)
+    secret: process.env.SECRET_SESSION, // Clave secreta para firmar la sesión (debería ser una cadena segura)
     resave: false, // Evita que la sesión se guarde en el almacén en cada solicitud
     saveUninitialized: false, // Evita que se cree una sesión no inicializada en la solicitud
 }))
@@ -33,12 +35,13 @@ app.use((req, res, next) => {
 })
 
 app.use(bodyParser.urlencoded({ extended: true }))
+
 // Base de datos configuración y acceso
 const dbConfig = {
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'rincon'
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
 }
 
 const connection = mysql.createConnection(dbConfig)
@@ -52,7 +55,7 @@ connection.connect((err) => {
 })
 
 module.exports = connection
-// Fin de bd
+
 // Configurar EJS como motor de plantillas
 app.set('view engine', 'ejs')
 // Establecer la ubicación de las plantillas EJS
@@ -934,7 +937,7 @@ app.get('/usuarios', (req, res) => {
     }
 })
 
-// Iniciar el servidor en el puerto 3000
-app.listen(3000, () => {
-    console.log('Servidor en ejecución en el puerto 3000!!!')
+// Iniciar el servidor para escuchar las peticiones
+app.listen(process.env.PORT, () => {
+    console.log(`Servidor en el puerto ${process.env.PORT}`)
 })
