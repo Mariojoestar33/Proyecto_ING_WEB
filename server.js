@@ -464,10 +464,11 @@ app.get('/perfil/compras', (req, res) => {
         const userId = req.session.usuario.id
         // Realiza una consulta para obtener las compras y productos comprados del usuario
         const sql = `
-        SELECT c.id AS compra_id, c.fecha_compra, p.id AS producto_id, p.nombre, p.precio, dc.cantidad_comprada, c.total
+        SELECT c.id AS compra_id, c.fecha_compra, p.id AS producto_id, p.nombre, p.precio, dc.cantidad_comprada, c.total, c.id_direccion, d.calle, d.cp, d.ciudad, d.colonia, d.numero_exterior
         FROM compras c
         JOIN detalles_compra dc ON c.id = dc.id_compra
         JOIN productos p ON dc.id_producto = p.id
+        JOIN direcciones d ON c.id_direccion = d.id
         WHERE c.id_usuario = ?;
         `
 
@@ -486,6 +487,12 @@ app.get('/perfil/compras', (req, res) => {
                         compra_id: row.compra_id,
                         fecha_compra: row.fecha_compra,
                         total: row.total,
+                        id_direccion: row.id_direccion,
+                        calle: row.calle,
+                        numero_exterior: row.numero_exterior,
+                        cp: row.cp,
+                        ciudad: row.ciudad,
+                        colonia: row.colonia,
                         productos: [],
                     }
                     comprasConProductos.push(compraActual)
@@ -508,6 +515,7 @@ app.get('/perfil/compras', (req, res) => {
         res.redirect('/login')
     }
 })
+
 
 // Ruta POST para mostrar los productos comprados de una compra específica
 app.post('/perfil/compras/mostrarProductos', (req, res) => {
@@ -627,82 +635,77 @@ app.post('/eliminarDelCarrito/:id', (req, res) => {
 
 // Ruta para realizar la compra con los productos en el carrito
 app.post('/realizarCompra', (req, res) => {
-    if (req.session.usuario) {
+    if (req.session.usuario && req.session.direccionSeleccionada) {
         const userId = req.session.usuario.id;
+        const direccionSeleccionada = req.session.direccionSeleccionada;
         // Paso 1: Crear una nueva compra en la tabla "compras"
-        connection.query('INSERT INTO compras (id_usuario, fecha_compra) VALUES (?, NOW())', [userId], (err, result) => {
+        connection.query('INSERT INTO compras (id_usuario, id_direccion, fecha_compra) VALUES (?, ?, NOW())', [userId, direccionSeleccionada], (err, result) => {
             if (err) {
                 console.error('Error al crear la compra:', err);
-                return res.status(500).send('Error interno del servidor');
+                return res.status(500).send('Error interno del servidor')
             }
             const compraId = result.insertId; // ID de la compra recién creada
-
             // Paso 2: Obtener los productos en el carrito del usuario, incluyendo el precio
             connection.query('SELECT c.id_producto, c.cantidad, p.precio FROM carrito c JOIN productos p ON c.id_producto = p.id WHERE c.id_usuario = ?', [userId], (err, productosEnCarrito) => {
                 if (err) {
-                    console.error('Error al obtener productos en el carrito:', err);
-                    return res.status(500).send('Error interno del servidor');
+                    console.error('Error al obtener productos en el carrito:', err)
+                    return res.status(500).send('Error interno del servidor')
                 }
-
                 // Paso 3: Copiar los productos del carrito a "detalles_compra" con el ID de la compra
-                const detallesCompraValues = productosEnCarrito.map(producto => [compraId, producto.id_producto, producto.cantidad]);
+                const detallesCompraValues = productosEnCarrito.map(producto => [compraId, producto.id_producto, producto.cantidad])
                 connection.query('INSERT INTO detalles_compra (id_compra, id_producto, cantidad_comprada) VALUES ?', [detallesCompraValues], (err) => {
                     if (err) {
-                        console.error('Error al copiar los productos a detalles_compra:', err);
-                        return res.status(500).send('Error interno del servidor');
+                        console.error('Error al copiar los productos a detalles_compra:', err)
+                        return res.status(500).send('Error interno del servidor')
                     }
-
                     // Paso 4: Calcular el total de la compra
                     const totalCompra = productosEnCarrito.reduce((total, producto) => {
-                        return total + producto.precio * producto.cantidad;
-                    }, 0);
-
+                        return total + producto.precio * producto.cantidad
+                    }, 0)
                     // Paso 5: Actualizar el total de la compra en la tabla "compras"
                     connection.query('UPDATE compras SET total = ? WHERE id = ?', [totalCompra, compraId], (err) => {
                         if (err) {
-                            console.error('Error al actualizar el total de la compra:', err);
-                            return res.status(500).send('Error interno del servidor');
+                            console.error('Error al actualizar el total de la compra:', err)
+                            return res.status(500).send('Error interno del servidor')
                         }
-
                         // Paso 6: Actualizar el stock de productos restando la cantidad comprada y luego eliminar los productos del carrito
                         const updateStockQueries = productosEnCarrito.map(producto => {
                             return new Promise((resolve, reject) => {
                                 // Actualizar el stock restando la cantidad comprada
                                 connection.query('UPDATE productos SET stock = stock - ? WHERE id = ?', [producto.cantidad, producto.id_producto], (err) => {
                                     if (err) {
-                                        console.error('Error al actualizar el stock del producto:', err);
-                                        reject(err);
+                                        console.error('Error al actualizar el stock del producto:', err)
+                                        reject(err)
                                     } else {
-                                        resolve();
+                                        resolve()
                                     }
-                                });
-                            });
-                        });
-
+                                })
+                            })
+                        })
                         // Ejecutar todas las actualizaciones del stock en paralelo
                         Promise.all(updateStockQueries)
                             .then(() => {
                                 // Paso 7: Eliminar los productos del carrito
                                 connection.query('DELETE FROM carrito WHERE id_usuario = ?', [userId], (err) => {
                                     if (err) {
-                                        console.error('Error al eliminar productos del carrito:', err);
-                                        return res.status(500).send('Error interno del servidor');
+                                        console.error('Error al eliminar productos del carrito:', err)
+                                        return res.status(500).send('Error interno del servidor')
                                     }
                                     // Paso 8: Redirigir al usuario a una página de confirmación o recibo
-                                    res.redirect('/perfil/compras');
-                                });
+                                    res.redirect('/perfil/compras')
+                                })
                             })
                             .catch((err) => {
-                                return res.status(500).send('Error interno del servidor');
-                            });
-                    });
-                });
-            });
-        });
+                                return res.status(500).send('Error interno del servidor')
+                            })
+                    })
+                })
+            })
+        })
     } else {
-        res.status(403).send('Acceso no autorizado');
+        res.status(403).send('Acceso no autorizado')
     }
-});
+})
 
 // Ruta para los productos
 app.get('/productos', (req, res) => {
@@ -968,10 +971,10 @@ app.get('/checkout', (req, res) => {
 app.get('/pago', (req, res) => {
     if (req.session.usuario) {
         // Recupera la dirección seleccionada de la sesión (asegúrate de que esté almacenada previamente)
-        const direccionSeleccionadaId = req.session.direccionSeleccionada;
+        const direccionSeleccionadaId = req.session.direccionSeleccionada
         res.locals.userRole = userRole
         // Realiza una consulta a la base de datos para obtener los datos de la dirección
-        const sql = 'SELECT * FROM direcciones WHERE id = ?';
+        const sql = 'SELECT * FROM direcciones WHERE id = ?'
         connection.query(sql, [direccionSeleccionadaId], (error, results) => {
             if (error) {
                 // Maneja el error, por ejemplo, mostrando un mensaje de error o redirigiendo al usuario.
@@ -979,7 +982,7 @@ app.get('/pago', (req, res) => {
                 console.error(error);
             } else {
                 // Los datos de la dirección están en results[0] (suponiendo que solo se espera un resultado)
-                const direccionSeleccionada = results[0];
+                const direccionSeleccionada = results[0]
 
                 res.render('pago', {
                     direccionSeleccionada, // Pasar la dirección seleccionada como variable local
@@ -988,9 +991,9 @@ app.get('/pago', (req, res) => {
             }
         });
     } else {
-        res.redirect('/login'); // Redirige al usuario
+        res.redirect('/login') // Redirige al usuario
     }
-});
+})
 
 app.post('/seleccionarDireccion', (req, res) => {
     const direccionSeleccionada = req.body.direccion_envio;

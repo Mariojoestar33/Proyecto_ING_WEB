@@ -1,38 +1,40 @@
 <!DOCTYPE html>
 <html lang="es">
-    <%- include('head') %>
-    <body>
-        <header>
-            <%- include('navbar') %>
-        </header>
-        <div class="cuerpoPerfil">
-            <%- include('dashboardPerfil') %>
-            <div>
-                <h2>Compras Realizadas (<%= compras.length%>)</h2>
-                <br>
-                <% if (compras.length <= 0) { %>
-                    <h5>Sin compras realizadas</h5>
-                <% } else { %>
-                    <ul class="si">
-                        <% compras.forEach((compra) => { %>
-                            <li class="listaProductosComprados">
-                                <button class="compra-button" data-compra-id="<%= compra.id %>">
-                                    Compra realizada: <%= compra.fecha_compra %>
-                                </button>
-                                <div class="productos-comprados" id="productos-comprados-<%= compra.id %>">
-                                    <!-- Aquí se mostrarán los productos comprados de esta compra -->
-                                    <% compra.productos.forEach((producto) => { %>
-                                        <!-- Muestra detalles del producto, como nombre, cantidad, etc. -->
-                                       <p> Producto: <%= producto.nombre %> <br> Precio: $<%= producto.precio %> <br> Cantidad: <%= producto.cantidad %> <br> Subtotal: $<%= producto.cantidad * producto.precio %> </p>
-                                    <% }) %>
-                                    <h4 style="text-align:center;">Total $<%= compra.total %></h4>
-                                </div>
-                            </li>
-                        <% }) %>
-                    </ul>
-                <% } %>
-            </div>
+<%- include('head') %>
+<body>
+    <header>
+        <%- include('navbar') %>
+    </header>
+    <div class="cuerpoPerfil">
+        <%- include('dashboardPerfil') %>
+        <div>
+            <h2>Compras Realizadas (<%= compras.length %>)</h2>
+            <br>
+            <% if (compras.length <= 0) { %>
+                <h5>Sin compras realizadas</h5>
+            <% } else { %>
+                <ul class="si">
+                    <% compras.forEach((compra) => { %>
+                        <li class="listaProductosComprados">
+                            <button class="compra-button" data-compra-id="<%= compra.id %>">
+                                Compra realizada: <%= compra.fecha_compra %>
+                            </button>
+                            <div class="productos-comprados" id="productos-comprados-<%= compra.id %>">
+                                <!-- Aquí se mostrarán los productos comprados de esta compra -->
+                                <% compra.productos.forEach((producto) => { %>
+                                    <!-- Muestra detalles del producto, como nombre, cantidad, etc. -->
+                                    <p>Producto: <%= producto.nombre %> <br> Precio: $<%= producto.precio %> <br> Cantidad: <%= producto.cantidad %> <br> Subtotal: $<%= producto.cantidad * producto.precio %></p>
+                                <% }) %>
+                                <h4 style="text-align:center;">Total $<%= compra.total %></h4>
+                                <!--<p>Dirección: <%= compra.direccion ? `${compra.direccion.calle}, ${compra.direccion.numero_exterior}, ${compra.direccion.colonia}, ${compra.direccion.ciudad}, CP: ${compra.direccion.cp}` : 'No se encontró dirección' %></p>-->
+                                <p>Dirección: <%= compra.calle %> <%= compra.numero_exterior %>, <%= compra.colonia %>, <%= compra.ciudad %>, <%= compra.cp %></p>
+                            </div>
+                        </li>
+                    <% }) %>
+                </ul>
+            <% } %>
         </div>
-        <%- include('footer', { currentYear: new Date().getFullYear() }) %>
-    </body>
+    </div>
+    <%- include('footer', { currentYear: new Date().getFullYear() }) %>
+</body>
 </html>
