@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<%- include('head') %>
+<body>
+    <header>
+        <%- include('navbar') %>
+    </header>
+    <div class="container">
+        <div class="subcontainer">
+            <% if (direccionSeleccionada) { %>
+                <p>La dirección seleccionada es:</p>
+                <p class="direccionCompra"><%= direccionSeleccionada.calle %>,<%= direccionSeleccionada.numero_exterior %>,<%= direccionSeleccionada.ciudad %>,<%= direccionSeleccionada.colonia %>,<%= direccionSeleccionada.cp %></p>
+                <a href="/checkout" class="btn btn-primary" id="cambiarDirCheck">Cambiar direccion</a>
+                <% } else { %>
+                <p>No se ha seleccionado una dirección.</p>
+            <% } %>  
+        </div>
+        <div class="subcontainer-check">
+            <h2 class="titulo">Metodo de Pago: </h2>
+            <br>
+            <p style="text-align: center;" class="alert alert-warning">Uso de Paypal unicamente por el momento, lamentamos los inconvenientes</p>
+            <form action="/pagar" method="post" class="formulario">
+                <button type="submit" class="btn btn-primary">Paypal</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

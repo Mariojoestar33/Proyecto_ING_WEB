@@ -34,9 +34,10 @@
             </ul>
 
             <% if (carrito.length > 0) { %>
-                <form action="/realizarCompra" method="post" class="formulario">
+                <!--<form action="/realizarCompra" method="post" class="formulario">
                     <button type="submit" class="btn btn-primary">Realizar Compra</button>
-                </form>
+                </form>-->
+                <a href="/Checkout" class="btn btn-primary">Realizar Compra</a>
             <% } else { %>
                 <p style="text-align: center;">No hay nada en el carrito</p>
             <% } %>

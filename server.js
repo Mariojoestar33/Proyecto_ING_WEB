@@ -937,6 +937,69 @@ app.get('/usuarios', (req, res) => {
     }
 })
 
+app.get('/checkout', (req, res) => {
+    if (req.session.usuario) {
+        // Recupera el ID del usuario logeado
+        const idUsuario = req.session.usuario.id
+        res.locals.userRole = userRole
+        // Realiza una consulta SQL para obtener las direcciones del usuario logeado
+        const sql = "SELECT * FROM direcciones WHERE id_usuario = ?";
+        connection.query(sql, [idUsuario], (error, results) => {
+            if (error) {
+                // Maneja el error de la consulta
+                console.error(error)
+                res.status(500).send("Error al recuperar las direcciones del usuario.");
+            } else {
+                // Si la consulta fue exitosa, los resultados contendrán las direcciones del usuario
+                const direcciones = results
+
+                // Renderiza la página con las direcciones del usuario
+                res.render('creacionCompra', { 
+                    direcciones,
+                    pageTitle: "Checkout" })
+            }
+        })
+    } else {
+        // Maneja el caso en el que el usuario no está autenticado
+        res.redirect('/login') // Redirige al usuario a la página de inicio de sesión, por ejemplo
+    }
+})
+
+app.get('/pago', (req, res) => {
+    if (req.session.usuario) {
+        // Recupera la dirección seleccionada de la sesión (asegúrate de que esté almacenada previamente)
+        const direccionSeleccionadaId = req.session.direccionSeleccionada;
+        res.locals.userRole = userRole
+        // Realiza una consulta a la base de datos para obtener los datos de la dirección
+        const sql = 'SELECT * FROM direcciones WHERE id = ?';
+        connection.query(sql, [direccionSeleccionadaId], (error, results) => {
+            if (error) {
+                // Maneja el error, por ejemplo, mostrando un mensaje de error o redirigiendo al usuario.
+                //console.log("Aqui esta el error")
+                console.error(error);
+            } else {
+                // Los datos de la dirección están en results[0] (suponiendo que solo se espera un resultado)
+                const direccionSeleccionada = results[0];
+
+                res.render('pago', {
+                    direccionSeleccionada, // Pasar la dirección seleccionada como variable local
+                    pageTitle: "Método de Pago"
+                });
+            }
+        });
+    } else {
+        res.redirect('/login'); // Redirige al usuario
+    }
+});
+
+app.post('/seleccionarDireccion', (req, res) => {
+    const direccionSeleccionada = req.body.direccion_envio;
+    // Aquí debes procesar la dirección seleccionada y guardarla en la sesión o la base de datos según tus necesidades.
+    req.session.direccionSeleccionada = direccionSeleccionada
+    // Después de procesar la selección, redirige al usuario a la página de Método de Pago.
+    res.redirect('/pago')
+})
+
 // Iniciar el servidor para escuchar las peticiones
 app.listen(process.env.PORT, () => {
     console.log(`Servidor en el puerto ${process.env.PORT}`)

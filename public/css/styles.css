@@ -477,3 +477,18 @@ footer {
     border: #000000 2px solid;
     margin: 0px;
 }
+
+.subcontainer-check {
+    margin-bottom: 70px;
+    display: flex;
+    flex-direction: column;
+}
+
+.direccionCompra {
+    font-size: 30px;
+    text-align: center;
+}
+
+#cambiarDirCheck {
+    margin-bottom: 50px;
+}
