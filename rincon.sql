@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.1.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 24-10-2023 a las 20:20:50
--- Versión del servidor: 5.7.36
--- Versión de PHP: 7.4.26
+-- Tiempo de generación: 02-11-2023 a las 22:18:48
+-- Versión del servidor: 8.0.31
+-- Versión de PHP: 8.0.26
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -29,15 +29,15 @@ SET time_zone = "+00:00";
 
 DROP TABLE IF EXISTS `carrito`;
 CREATE TABLE IF NOT EXISTS `carrito` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `id_usuario` int(11) NOT NULL,
-  `id_producto` int(11) NOT NULL,
-  `cantidad` int(11) NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id_usuario` int NOT NULL,
+  `id_producto` int NOT NULL,
+  `cantidad` int NOT NULL,
   `fecha_creacion` timestamp NOT NULL,
   PRIMARY KEY (`id`),
   KEY `id_usuario` (`id_usuario`),
   KEY `id_producto` (`id_producto`)
-) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -47,20 +47,23 @@ CREATE TABLE IF NOT EXISTS `carrito` (
 
 DROP TABLE IF EXISTS `compras`;
 CREATE TABLE IF NOT EXISTS `compras` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `id_usuario` int(11) DEFAULT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id_usuario` int DEFAULT NULL,
   `fecha_compra` date DEFAULT NULL,
   `total` decimal(10,2) DEFAULT NULL,
+  `id_direccion` int DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `id_usuario` (`id_usuario`)
-) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
+  KEY `id_usuario` (`id_usuario`),
+  KEY `fk_compras_direccion` (`id_direccion`)
+) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `compras`
 --
 
-INSERT INTO `compras` (`id`, `id_usuario`, `fecha_compra`, `total`) VALUES
-(7, 21, '2023-10-24', '148.50');
+INSERT INTO `compras` (`id`, `id_usuario`, `fecha_compra`, `total`, `id_direccion`) VALUES
+(7, 21, '2023-10-24', '148.50', 19),
+(8, 21, '2023-11-02', '48.00', 19);
 
 -- --------------------------------------------------------
 
@@ -70,14 +73,14 @@ INSERT INTO `compras` (`id`, `id_usuario`, `fecha_compra`, `total`) VALUES
 
 DROP TABLE IF EXISTS `detalles_compra`;
 CREATE TABLE IF NOT EXISTS `detalles_compra` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `id_compra` int(11) DEFAULT NULL,
-  `id_producto` int(11) DEFAULT NULL,
-  `cantidad_comprada` int(11) DEFAULT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id_compra` int DEFAULT NULL,
+  `id_producto` int DEFAULT NULL,
+  `cantidad_comprada` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_compra` (`id_compra`),
   KEY `id_producto` (`id_producto`)
-) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `detalles_compra`
@@ -85,7 +88,8 @@ CREATE TABLE IF NOT EXISTS `detalles_compra` (
 
 INSERT INTO `detalles_compra` (`id`, `id_compra`, `id_producto`, `cantidad_comprada`) VALUES
 (8, 7, 14, 13),
-(9, 7, 4, 8);
+(9, 7, 4, 8),
+(10, 8, 8, 8);
 
 -- --------------------------------------------------------
 
@@ -95,8 +99,8 @@ INSERT INTO `detalles_compra` (`id`, `id_compra`, `id_producto`, `cantidad_compr
 
 DROP TABLE IF EXISTS `direcciones`;
 CREATE TABLE IF NOT EXISTS `direcciones` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `id_usuario` int(11) DEFAULT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id_usuario` int DEFAULT NULL,
   `calle` varchar(64) DEFAULT NULL,
   `numero_exterior` varchar(10) DEFAULT NULL,
   `ciudad` varchar(64) DEFAULT NULL,
@@ -104,7 +108,7 @@ CREATE TABLE IF NOT EXISTS `direcciones` (
   `colonia` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_usuario` (`id_usuario`)
-) ENGINE=MyISAM AUTO_INCREMENT=19 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `direcciones`
@@ -126,7 +130,8 @@ INSERT INTO `direcciones` (`id`, `id_usuario`, `calle`, `numero_exterior`, `ciud
 (13, 13, 'Calle 13', '1010', 'Ciudad M', '99000', 'Colonia N'),
 (14, 14, 'Calle 14', '1111', 'Ciudad N', '55443', 'Colonia M'),
 (15, 15, 'Calle 15', '1212', 'Ciudad O', '22334', 'Colonia L'),
-(18, 21, 'Eten', '612-A', 'CDMX', '07730', 'San Bartolo Atepehuacan');
+(18, 21, 'Eten', '612-A', 'CDMX', '07730', 'San Bartolo Atepehuacan'),
+(19, 21, 'Rayuel', '320', 'CDMX', '09878', 'Churubusco');
 
 -- --------------------------------------------------------
 
@@ -136,16 +141,16 @@ INSERT INTO `direcciones` (`id`, `id_usuario`, `calle`, `numero_exterior`, `ciud
 
 DROP TABLE IF EXISTS `productos`;
 CREATE TABLE IF NOT EXISTS `productos` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(64) DEFAULT NULL,
   `categoria` varchar(64) DEFAULT NULL,
-  `stock` int(11) DEFAULT NULL,
+  `stock` int DEFAULT NULL,
   `descripcion` varchar(64) DEFAULT NULL,
   `imagen` varchar(255) DEFAULT NULL,
   `precio` decimal(10,2) DEFAULT NULL,
   `marca` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=21 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `productos`
@@ -159,7 +164,7 @@ INSERT INTO `productos` (`id`, `nombre`, `categoria`, `stock`, `descripcion`, `i
 (5, 'Lápiz 1', 'Escritura', 150, 'Lápiz de grafito', 'images/escritura/lapiz_1.jpg', '5.00', 'Bond'),
 (6, 'Pegamento 1', 'Adhesivos', 0, 'Lápiz adhesivo', 'images/adhesivos/lapiz_1.jpg', '14.50', 'Barol'),
 (7, 'Tijeras 1', 'Herramientas', 20, 'Tijeras para niños', 'images/herramientas/tijeras_1.jpg', '20.00', 'Barrilito'),
-(8, 'Goma de borrar 1', 'Escritura', 80, 'Goma para borrar de pan.', 'images/escritura/goma_1.jpg', '6.00', 'Scribe'),
+(8, 'Goma de borrar 1', 'Escritura', 72, 'Goma para borrar de pan.', 'images/escritura/goma_1.jpg', '6.00', 'Scribe'),
 (9, 'Cinta adhesiva 1', 'Adhesivos', 40, 'Cinta adhesiva de 40 metros.', 'images/adhesivos/cinta_1.jpg', '13.00', 'Borax'),
 (10, 'Marcador 1', 'Escritura', 60, 'Marcador amarillo.', 'images/escritura/marcador_1.jpg', '18.00', 'Paper Mate'),
 (11, 'Cuaderno 2', 'Papel', 45, 'Cuaderno profesional de 100 hojas cuadro grande.', 'images/papel/cuaderno_2.jpg', '95.00', 'Scribe'),
@@ -179,14 +184,14 @@ INSERT INTO `productos` (`id`, `nombre`, `categoria`, `stock`, `descripcion`, `i
 
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(64) DEFAULT NULL,
   `correo` varchar(64) DEFAULT NULL,
   `tipo` enum('administrador','editor','cliente') DEFAULT NULL,
   `contrasenia` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `correo` (`correo`)
-) ENGINE=MyISAM AUTO_INCREMENT=26 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `users`
