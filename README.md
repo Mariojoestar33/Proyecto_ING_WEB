@@ -7,4 +7,4 @@ Proposed project for the subject of web engineering in which a solution to the s
 
 # Technologies
 
-**Nodejs** with **Express** will be used for the backend part, a **mySQL** relational database will be used, the Frontend framework will not be used and the **EJS** template engine will be used.
+**Nodejs** with **Express** will be used for the backend part, a **mySQL** relational database will be used, we will be using the **EJS** for the layouts and views.
