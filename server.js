@@ -9,6 +9,62 @@ const app = express()
 const { createHash } = require('crypto') //Encriptacion
 const bodyParser = require('body-parser') //Para poder leer los datos de formularios
 
+/*
+const items = [];
+                    var total = 0;
+                    productosEnCarrito.forEach((producto) => {
+                        const item = {
+                            name: producto.nombre,
+                            sku: producto.id_producto.toString(),
+                            price: producto.precio.toString(),
+                            currency: "MXN",
+                            quantity: producto.cantidad.toString(),
+                        }
+                        total += producto.precio * producto.cantidad;
+                        items.push(item)
+                    })
+                    const create_payment_json = {
+                        "intent": "sale",
+                        "payer": {
+                            "payment_method": "paypal"
+                        },
+                        "redirect_urls": {
+                            "return_url": "http://localhost:3000/success",
+                            "cancel_url": "http://localhost:3000/cancel"
+                        },
+                        "transactions": [{
+                            "item_list": {
+                                "items": items,
+                            },
+                            "amount": {
+                                "currency": "USD",
+                                "total": total,
+                            },
+                            "description": "Hat for the best team ever"
+                        }]
+                    }
+                    paypal.payment.create(create_payment_json, function (error, payment) {
+                        if (error) {
+                            throw error
+                        } else {
+                            for(let i = 0;i < payment.links.length;i++){
+                              if(payment.links[i].rel === 'approval_url'){
+                                res.redirect(payment.links[i].href)
+                              }
+                            }
+                        }
+                    })
+*/
+
+//Paypal
+const paypal = require('paypal-rest-sdk')
+
+paypal.configure({
+    'mode': 'sandbox', //sandbox or live
+    'client_id': 'AaUvFohBw5-u2J17TYH7gTXGZ868mkoF9ZOY4O5nlqwMmfObvI-qRKAh3yHrW6a31ZP8IFWNvDrsuPrX',
+    'client_secret': 'ECOSdz26BmxvQHVSgXJRuqYyijsdaqMat0LGxH0MWhR2I3DJPMUf3enGzyBcMYY1IWHrOYGVtpMjT49I'
+})
+
 require("dotenv").config() //Se añade el archivo de configuracion de datos para privacidad
 
 let userRole = null //Variable para el rol del usuario
@@ -510,6 +566,7 @@ app.get('/perfil/compras', (req, res) => {
                 compras: comprasConProductos,
                 userRole: userRole
             })
+            //res.json(compras)
         })
     } else {
         res.redirect('/login')
@@ -639,14 +696,16 @@ app.post('/realizarCompra', (req, res) => {
         const userId = req.session.usuario.id;
         const direccionSeleccionada = req.session.direccionSeleccionada;
         // Paso 1: Crear una nueva compra en la tabla "compras"
-        connection.query('INSERT INTO compras (id_usuario, id_direccion, fecha_compra) VALUES (?, ?, NOW())', [userId, direccionSeleccionada], (err, result) => {
+        const sql1 = 'INSERT INTO compras (id_usuario, id_direccion, fecha_compra) VALUES (?, ?, NOW())'
+        connection.query(sql1 , [userId, direccionSeleccionada], (err, result) => {
             if (err) {
                 console.error('Error al crear la compra:', err);
                 return res.status(500).send('Error interno del servidor')
             }
             const compraId = result.insertId; // ID de la compra recién creada
             // Paso 2: Obtener los productos en el carrito del usuario, incluyendo el precio
-            connection.query('SELECT c.id_producto, c.cantidad, p.precio FROM carrito c JOIN productos p ON c.id_producto = p.id WHERE c.id_usuario = ?', [userId], (err, productosEnCarrito) => {
+            const sql2 = 'SELECT c.id_producto, c.cantidad, p.precio, p.nombre FROM carrito c JOIN productos p ON c.id_producto = p.id WHERE c.id_usuario = ?'
+            connection.query(sql2, [userId], (err, productosEnCarrito) => {
                 if (err) {
                     console.error('Error al obtener productos en el carrito:', err)
                     return res.status(500).send('Error interno del servidor')
@@ -1001,6 +1060,170 @@ app.post('/seleccionarDireccion', (req, res) => {
     req.session.direccionSeleccionada = direccionSeleccionada
     // Después de procesar la selección, redirige al usuario a la página de Método de Pago.
     res.redirect('/pago')
+})
+
+//Ruta para la creacion del pago por medio de paypal
+app.post('/pay', (req, res) => {
+        res.locals.userRole = userRole
+        const userId = req.session.usuario.id
+        const sql = 'SELECT c.id_producto, c.cantidad, p.precio, p.nombre, p.descripcion FROM carrito c JOIN productos p ON c.id_producto = p.id WHERE c.id_usuario = ?'
+        connection.query(sql, [userId], (err, productosEnCarrito) => {
+            if(err) {
+                console.error('Error al obtener productos en el carrito:', err)
+                return res.status(500).send('Error interno del servidor')
+            } else {
+                const items = []
+                var total = 0
+                productosEnCarrito.forEach((producto) => {
+                    const item = {
+                        name: producto.nombre,
+                        sku: producto.id_producto.toString(),
+                        price: producto.precio.toString(),
+                        currency: "MXN",
+                        quantity: producto.cantidad.toString(),
+                    }
+                    total += producto.precio * producto.cantidad;
+                    items.push(item)
+                })
+                req.session.total = total
+                const create_payment_json = {
+                    "intent": "sale",
+                    "payer": {
+                        "payment_method": "paypal"
+                    },
+                    "redirect_urls": {
+                        "return_url": "http://localhost:3000/success",
+                        "cancel_url": "http://localhost:3000/pago"
+                    },
+                    "transactions": [{
+                        "item_list": {
+                            "items": items,
+                        },
+                        "amount": {
+                            "currency": "MXN",
+                            "total": total,
+                        },
+                        "description": "Compra realizada en rincon paramo!!!"
+                    }]
+                }
+
+                paypal.payment.create(create_payment_json, function (error, payment) {
+                    if (error) {
+                        throw error
+                    } else {
+                        for(let i = 0;i < payment.links.length;i++){
+                            if(payment.links[i].rel === 'approval_url'){
+                             res.redirect(payment.links[i].href)
+                             }
+                          }
+                     }
+                })
+            }
+        })
+        console.log("Listo...")
+})
+
+app.get('/cancel', (req, res) => {
+    res.locals.userRole = userRole
+    res.send('Cancelled')
+})
+
+app.get('/success', (req, res) => {
+    res.locals.userRole = userRole
+    const payerId = req.query.PayerID;
+    const paymentId = req.query.paymentId;
+    console.log(req.session.total)
+  
+    const execute_payment_json = {
+      "payer_id": payerId,
+      "transactions": [{
+          "amount": {
+              "currency": "MXN",
+              "total": req.session.total,
+          }
+      }]
+    };
+    paypal.payment.execute(paymentId, execute_payment_json, function (error, payment) {
+      if (error) {
+          console.log(error.response)
+          throw error
+      } else {
+          console.log(JSON.stringify(payment))
+          if (req.session.usuario && req.session.direccionSeleccionada) {
+            const userId = req.session.usuario.id;
+            const direccionSeleccionada = req.session.direccionSeleccionada;
+            // Paso 1: Crear una nueva compra en la tabla "compras"
+            const sql1 = 'INSERT INTO compras (id_usuario, id_direccion, fecha_compra) VALUES (?, ?, NOW())'
+            connection.query(sql1 , [userId, direccionSeleccionada], (err, result) => {
+                if (err) {
+                    console.error('Error al crear la compra:', err);
+                    return res.status(500).send('Error interno del servidor')
+                }
+                const compraId = result.insertId; // ID de la compra recién creada
+                // Paso 2: Obtener los productos en el carrito del usuario, incluyendo el precio
+                const sql2 = 'SELECT c.id_producto, c.cantidad, p.precio, p.nombre FROM carrito c JOIN productos p ON c.id_producto = p.id WHERE c.id_usuario = ?'
+                connection.query(sql2, [userId], (err, productosEnCarrito) => {
+                    if (err) {
+                        console.error('Error al obtener productos en el carrito:', err)
+                        return res.status(500).send('Error interno del servidor')
+                    }
+                    // Paso 3: Copiar los productos del carrito a "detalles_compra" con el ID de la compra
+                    const detallesCompraValues = productosEnCarrito.map(producto => [compraId, producto.id_producto, producto.cantidad])
+                    connection.query('INSERT INTO detalles_compra (id_compra, id_producto, cantidad_comprada) VALUES ?', [detallesCompraValues], (err) => {
+                        if (err) {
+                            console.error('Error al copiar los productos a detalles_compra:', err)
+                            return res.status(500).send('Error interno del servidor')
+                        }
+                        // Paso 4: Calcular el total de la compra
+                        const totalCompra = productosEnCarrito.reduce((total, producto) => {
+                            return total + producto.precio * producto.cantidad
+                        }, 0)
+                        // Paso 5: Actualizar el total de la compra en la tabla "compras"
+                        connection.query('UPDATE compras SET total = ? WHERE id = ?', [totalCompra, compraId], (err) => {
+                            if (err) {
+                                console.error('Error al actualizar el total de la compra:', err)
+                                return res.status(500).send('Error interno del servidor')
+                            }
+                            // Paso 6: Actualizar el stock de productos restando la cantidad comprada y luego eliminar los productos del carrito
+                            const updateStockQueries = productosEnCarrito.map(producto => {
+                                return new Promise((resolve, reject) => {
+                                    // Actualizar el stock restando la cantidad comprada
+                                    connection.query('UPDATE productos SET stock = stock - ? WHERE id = ?', [producto.cantidad, producto.id_producto], (err) => {
+                                        if (err) {
+                                            console.error('Error al actualizar el stock del producto:', err)
+                                            reject(err)
+                                        } else {
+                                            resolve()
+                                        }
+                                    })
+                                })
+                            })
+                            // Ejecutar todas las actualizaciones del stock en paralelo
+                            Promise.all(updateStockQueries)
+                                .then(() => {
+                                    // Paso 7: Eliminar los productos del carrito
+                                    connection.query('DELETE FROM carrito WHERE id_usuario = ?', [userId], (err) => {
+                                        if (err) {
+                                            console.error('Error al eliminar productos del carrito:', err)
+                                            return res.status(500).send('Error interno del servidor')
+                                        }
+                                        // Paso 8: Redirigir al usuario a una página de confirmación o recibo
+                                        res.redirect('/perfil/compras')
+                                    })
+                                })
+                                .catch((err) => {
+                                    return res.status(500).send('Error interno del servidor')
+                                })
+                        })
+                    })
+                })
+            })
+        } else {
+            res.status(403).send('Acceso no autorizado')
+        }
+        //res.send('Success')
+      }
+    })
 })
 
 // Iniciar el servidor para escuchar las peticiones
