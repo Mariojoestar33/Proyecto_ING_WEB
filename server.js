@@ -5,67 +5,19 @@ const mysql = require('mysql')
 const multer = require('multer')
 const sharp = require('sharp')
 const fs = require('fs')
-const app = express()
 const { createHash } = require('crypto') //Encriptacion
 const bodyParser = require('body-parser') //Para poder leer los datos de formularios
+const paypal = require('paypal-rest-sdk') //Paypal
 
-/*
-const items = [];
-                    var total = 0;
-                    productosEnCarrito.forEach((producto) => {
-                        const item = {
-                            name: producto.nombre,
-                            sku: producto.id_producto.toString(),
-                            price: producto.precio.toString(),
-                            currency: "MXN",
-                            quantity: producto.cantidad.toString(),
-                        }
-                        total += producto.precio * producto.cantidad;
-                        items.push(item)
-                    })
-                    const create_payment_json = {
-                        "intent": "sale",
-                        "payer": {
-                            "payment_method": "paypal"
-                        },
-                        "redirect_urls": {
-                            "return_url": "http://localhost:3000/success",
-                            "cancel_url": "http://localhost:3000/cancel"
-                        },
-                        "transactions": [{
-                            "item_list": {
-                                "items": items,
-                            },
-                            "amount": {
-                                "currency": "USD",
-                                "total": total,
-                            },
-                            "description": "Hat for the best team ever"
-                        }]
-                    }
-                    paypal.payment.create(create_payment_json, function (error, payment) {
-                        if (error) {
-                            throw error
-                        } else {
-                            for(let i = 0;i < payment.links.length;i++){
-                              if(payment.links[i].rel === 'approval_url'){
-                                res.redirect(payment.links[i].href)
-                              }
-                            }
-                        }
-                    })
-*/
-
-//Paypal
-const paypal = require('paypal-rest-sdk')
-
-paypal.configure({
-    'mode': 'sandbox', //sandbox or live
-    'client_id': 'AaUvFohBw5-u2J17TYH7gTXGZ868mkoF9ZOY4O5nlqwMmfObvI-qRKAh3yHrW6a31ZP8IFWNvDrsuPrX',
-    'client_secret': 'ECOSdz26BmxvQHVSgXJRuqYyijsdaqMat0LGxH0MWhR2I3DJPMUf3enGzyBcMYY1IWHrOYGVtpMjT49I'
-})
+const app = express()
 
 require("dotenv").config() //Se añade el archivo de configuracion de datos para privacidad
+
+paypal.configure({
+    'mode': process.env.MODE_PAYPAL,
+    'client_id': process.env.CLIENT_ID_PAYPAL,
+    'client_secret': process.env.CLIENT_SECRET_PAYPAL,
+})
 
 let userRole = null //Variable para el rol del usuario
 
@@ -78,22 +30,18 @@ app.use(session( { //Manejo de sesiones
 }))
 
 app.use((req, res, next) => {
-    if (req.session.usuario) {
-        // Si el usuario ha iniciado sesión, obtén su rol desde la sesión
+    if (req.session.usuario) { // Si el usuario ha iniciado sesión, obtén su rol desde la sesión
         userName = req.session.usuario.nombre //Asuminedo que la sesion tiene el nombre del usuario logeado
         userRole = req.session.usuario.tipo // Asumiendo que la sesión contiene el rol del usuario
-    } else {
-        // Si no ha iniciado sesión, establece un valor predeterminado (por ejemplo, "invitado")
+    } else {  // Si no ha iniciado sesión se establece un predeterminado
         userRole = "invitado"
     }
-    // Continúa con la ejecución del siguiente middleware
-    next()
+    next() // Continúa con la ejecución del siguiente middleware
 })
 
 app.use(bodyParser.urlencoded({ extended: true }))
 
-// Base de datos configuración y acceso
-const dbConfig = {
+const dbConfig = { // Base de datos configuración y acceso
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
@@ -1120,7 +1068,7 @@ app.post('/pay', (req, res) => {
                 })
             }
         })
-        console.log("Listo...")
+        console.log("Entrada a API Paypal")
 })
 
 app.get('/cancel', (req, res) => {
