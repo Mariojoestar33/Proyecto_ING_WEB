@@ -24,7 +24,7 @@ You will need to install all the dependencies after you download it.
 $ npm install
 ```
 
-You also will need to create the DB with the file **rincon.sql** and create your **.env** file with all your credentials.
+You will also need to create the DB with the file **rincon.sql** and create your **.env** file with all your credentials.
 
 ### Serve
 
