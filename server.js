@@ -484,7 +484,6 @@ app.get('/perfil/compras', (req, res) => {
         JOIN direcciones d ON c.id_direccion = d.id
         WHERE c.id_usuario = ?;
         `
-
         connection.query(sql, [userId], (err, compras) => {
             if (err) {
                 console.error('Error al obtener compras:', err)
@@ -493,8 +492,7 @@ app.get('/perfil/compras', (req, res) => {
             // Organiza los datos en una estructura adecuada para la vista
             const comprasConProductos = []
             let compraActual = null
-
-            for (const row of compras) {
+            for (const row of compras) { //Organiza las comrpas registradas el usuario
                 if (!compraActual || compraActual.compra_id !== row.compra_id) {
                     compraActual = {
                         compra_id: row.compra_id,
@@ -517,7 +515,6 @@ app.get('/perfil/compras', (req, res) => {
                     cantidad: row.cantidad_comprada,
                 })
             }
-
             res.render('compras', {
                 pageTitle: 'Compras Realizadas',
                 compras: comprasConProductos,

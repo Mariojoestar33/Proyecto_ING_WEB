@@ -492,3 +492,7 @@ footer {
 #cambiarDirCheck {
     margin-bottom: 50px;
 }
+
+#btnCheckout {
+    width: 200px;
+}
