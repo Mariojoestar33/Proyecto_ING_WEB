@@ -3,10 +3,10 @@ USE rincon;
 
 DROP TABLE IF EXISTS carrito;
 CREATE TABLE IF NOT EXISTS carrito (
-  id int NOT NULL AUTO_INCREMENT,
-  id_usuario int NOT NULL,
-  id_producto int NOT NULL,
-  cantidad int NOT NULL,
+  id int(11) NOT NULL AUTO_INCREMENT,
+  id_usuario int(11) NOT NULL,
+  id_producto int(11) NOT NULL,
+  cantidad int(11) NOT NULL,
   fecha_creacion timestamp NOT NULL,
   PRIMARY KEY (id),
   KEY id_usuario (id_usuario),
@@ -15,40 +15,31 @@ CREATE TABLE IF NOT EXISTS carrito (
 
 DROP TABLE IF EXISTS compras;
 CREATE TABLE IF NOT EXISTS compras (
-  id int NOT NULL AUTO_INCREMENT,
-  id_usuario int DEFAULT NULL,
+  id int(11) NOT NULL AUTO_INCREMENT,
+  id_usuario int(11) DEFAULT NULL,
   fecha_compra date DEFAULT NULL,
   total decimal(10,2) DEFAULT NULL,
-  id_direccion int DEFAULT NULL,
+  id_direccion int(11) DEFAULT NULL,
   PRIMARY KEY (id),
   KEY id_usuario (id_usuario),
   KEY fk_compras_direccion (id_direccion)
 );
 
-INSERT INTO compras (id, id_usuario, fecha_compra, total, id_direccion) VALUES
-(7, 21, '2023-10-24', '148.50', 19),
-(8, 21, '2023-11-02', '48.00', 19);
-
 DROP TABLE IF EXISTS detalles_compra;
 CREATE TABLE IF NOT EXISTS detalles_compra (
-  id int NOT NULL AUTO_INCREMENT,
-  id_compra int DEFAULT NULL,
-  id_producto int DEFAULT NULL,
-  cantidad_comprada int DEFAULT NULL,
+  id int(11) NOT NULL AUTO_INCREMENT,
+  id_compra int(11) DEFAULT NULL,
+  id_producto int(11) DEFAULT NULL,
+  cantidad_comprada int(11) DEFAULT NULL,
   PRIMARY KEY (id),
   KEY id_compra (id_compra),
   KEY id_producto (id_producto)
 );
 
-INSERT INTO detalles_compra (id, id_compra, id_producto, cantidad_comprada) VALUES
-(8, 7, 14, 13),
-(9, 7, 4, 8),
-(10, 8, 8, 8);
-
 DROP TABLE IF EXISTS direcciones;
 CREATE TABLE IF NOT EXISTS direcciones (
-  id int NOT NULL AUTO_INCREMENT,
-  id_usuario int DEFAULT NULL,
+  id int(11) NOT NULL AUTO_INCREMENT,
+  id_usuario int(11) DEFAULT NULL,
   calle varchar(64) DEFAULT NULL,
   numero_exterior varchar(10) DEFAULT NULL,
   ciudad varchar(64) DEFAULT NULL,
@@ -58,36 +49,29 @@ CREATE TABLE IF NOT EXISTS direcciones (
   KEY id_usuario (id_usuario)
 );
 
-INSERT INTO direcciones (id, id_usuario, calle, numero_exterior, ciudad, cp, colonia) VALUES
-(1, 1, 'Calle 1', '123', 'Ciudad A', '12345', 'Colonia X'),
-(2, 2, 'Calle 2', '456', 'Ciudad B', '67890', 'Colonia Y'),
-(3, 3, 'Calle 3', '789', 'Ciudad C', '98765', 'Colonia Z'),
-(4, 4, 'Calle 4', '101', 'Ciudad D', '54321', 'Colonia W'),
-(5, 5, 'Calle 5', '202', 'Ciudad E', '11223', 'Colonia V'),
-(6, 6, 'Calle 6', '303', 'Ciudad F', '99887', 'Colonia U'),
-(7, 7, 'Calle 7', '404', 'Ciudad G', '33445', 'Colonia T'),
-(8, 8, 'Calle 8', '505', 'Ciudad H', '77666', 'Colonia S'),
-(9, 9, 'Calle 9', '606', 'Ciudad I', '22557', 'Colonia R'),
-(10, 10, 'Calle 10', '707', 'Ciudad J', '66778', 'Colonia Q'),
-(11, 11, 'Calle 11', '808', 'Ciudad K', '88999', 'Colonia P'),
-(12, 12, 'Calle 12', '909', 'Ciudad L', '11222', 'Colonia O'),
-(13, 13, 'Calle 13', '1010', 'Ciudad M', '99000', 'Colonia N'),
-(14, 14, 'Calle 14', '1111', 'Ciudad N', '55443', 'Colonia M'),
-(15, 15, 'Calle 15', '1212', 'Ciudad O', '22334', 'Colonia L'),
-(18, 21, 'Eten', '612-A', 'CDMX', '07730', 'San Bartolo Atepehuacan'),
-(19, 21, 'Rayuel', '320', 'CDMX', '09878', 'Churubusco');
-
 DROP TABLE IF EXISTS productos;
 CREATE TABLE IF NOT EXISTS productos (
-  id int NOT NULL AUTO_INCREMENT,
+  id int(11) NOT NULL AUTO_INCREMENT,
   nombre varchar(64) DEFAULT NULL,
   categoria varchar(64) DEFAULT NULL,
-  stock int DEFAULT NULL,
+  stock int(11) DEFAULT NULL,
   descripcion varchar(64) DEFAULT NULL,
   imagen varchar(255) DEFAULT NULL,
   precio decimal(10,2) DEFAULT NULL,
   marca varchar(64) DEFAULT NULL,
   PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS users;
+CREATE TABLE IF NOT EXISTS users (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  nombre varchar(64) DEFAULT NULL,
+  correo varchar(64) DEFAULT NULL,
+  tipo enum('administrador','editor','cliente') DEFAULT NULL,
+  contrasenia varchar(255) DEFAULT NULL,
+  salt varchar(64) DEFAULT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY correo (correo)
 );
 
 INSERT INTO productos (id, nombre, categoria, stock, descripcion, imagen, precio, marca) VALUES
@@ -110,35 +94,40 @@ INSERT INTO productos (id, nombre, categoria, stock, descripcion, imagen, precio
 (20, 'Libreta forma francesa', 'Papel', 20, 'Libreta Scribbe con forma francesa y rayas de 100 hojas.', 'images/Papel/libreta-forma-francesa.jpg', '98.00', 'Scribe'),
 (18, 'Tijeras 3', 'Herramientas', 2, 'Si', 'images/Herramientas/tijeras-3.jpg', '24.00', 'Borax');
 
-DROP TABLE IF EXISTS users;
-CREATE TABLE IF NOT EXISTS users (
-  id int NOT NULL AUTO_INCREMENT,
-  nombre varchar(64) DEFAULT NULL,
-  correo varchar(64) DEFAULT NULL,
-  tipo enum('administrador','editor','cliente') DEFAULT NULL,
-  contrasenia varchar(255) DEFAULT NULL,
-  PRIMARY KEY (id),
-  UNIQUE KEY correo (correo)
-);
+INSERT INTO carrito (id, id_usuario, id_producto, cantidad, fecha_creacion) VALUES
+(1, 21, 1, 16, '2023-11-06 19:42:06');
 
-INSERT INTO users (id, nombre, correo, tipo, contrasenia) VALUES
-(19, 'Mariano Peña Romero', 'mariano.pena15@gmail.com', 'administrador', 'a2a816e9eff8ef8eb22aa464879ee3a51f7fe9757a6a3a1fa012bed349b2c258'),
-(3, 'Carlos', 'carlos@example.com', 'cliente', 'hash3'),
-(4, 'Laura', 'laura@example.com', 'cliente', 'hash4'),
-(5, 'Pedro', 'pedro@example.com', 'cliente', 'hash5'),
-(6, 'Sofía', 'sofia@example.com', 'cliente', 'hash6'),
-(7, 'Luis', 'luis@example.com', 'cliente', 'hash7'),
-(8, 'Ana', 'ana@example.com', 'cliente', 'hash8'),
-(9, 'Miguel', 'miguel@example.com', 'cliente', 'hash9'),
-(10, 'Elena', 'elena@example.com', 'cliente', 'hash10'),
-(11, 'Raúl', 'raul@example.com', 'cliente', 'hash11'),
-(12, 'Carmen', 'carmen@example.com', 'cliente', 'hash12'),
-(13, 'Javier', 'javier@example.com', 'cliente', 'hash13'),
-(14, 'Isabel', 'isabel@example.com', 'cliente', 'hash14'),
-(15, 'Antonio', 'antonio@example.com', 'cliente', 'hash15'),
-(18, 'Jorge', 'raiden12@gmail.com', 'editor', 'a2a816e9eff8ef8eb22aa464879ee3a51f7fe9757a6a3a1fa012bed349b2c258'),
-(21, 'Tania', 'tann07lee04@gmail.com', 'cliente', '9df7d62dbc19dc31d1a11e7e9fe399babedfba0473235452fa1d357b9dddaf3c'),
-(22, 'Kakas', 'masdk@hotmail.com', 'cliente', 'a2a816e9eff8ef8eb22aa464879ee3a51f7fe9757a6a3a1fa012bed349b2c258'),
-(23, 'Luis Barreras', 'lksldk@gmail.com', 'cliente', 'a2a816e9eff8ef8eb22aa464879ee3a51f7fe9757a6a3a1fa012bed349b2c258'),
-(25, 'lasklaslk', 'cxhagsd@gmail.com', 'editor', 'a2a816e9eff8ef8eb22aa464879ee3a51f7fe9757a6a3a1fa012bed349b2c258');
+
+INSERT INTO compras (id, id_usuario, fecha_compra, total, id_direccion) VALUES
+(7, 21, '2023-10-24', '148.50', 19),
+(8, 21, '2023-11-02', '48.00', 19);
+
+INSERT INTO direcciones (id, id_usuario, calle, numero_exterior, ciudad, cp, colonia) VALUES
+(1, 1, 'Calle 1', '123', 'Ciudad A', '12345', 'Colonia X'),
+(2, 2, 'Calle 2', '456', 'Ciudad B', '67890', 'Colonia Y'),
+(3, 3, 'Calle 3', '789', 'Ciudad C', '98765', 'Colonia Z'),
+(4, 4, 'Calle 4', '101', 'Ciudad D', '54321', 'Colonia W'),
+(5, 5, 'Calle 5', '202', 'Ciudad E', '11223', 'Colonia V'),
+(6, 6, 'Calle 6', '303', 'Ciudad F', '99887', 'Colonia U'),
+(7, 7, 'Calle 7', '404', 'Ciudad G', '33445', 'Colonia T'),
+(8, 8, 'Calle 8', '505', 'Ciudad H', '77666', 'Colonia S'),
+(9, 9, 'Calle 9', '606', 'Ciudad I', '22557', 'Colonia R'),
+(10, 10, 'Calle 10', '707', 'Ciudad J', '66778', 'Colonia Q'),
+(11, 11, 'Calle 11', '808', 'Ciudad K', '88999', 'Colonia P'),
+(12, 12, 'Calle 12', '909', 'Ciudad L', '11222', 'Colonia O'),
+(13, 13, 'Calle 13', '1010', 'Ciudad M', '99000', 'Colonia N'),
+(14, 14, 'Calle 14', '1111', 'Ciudad N', '55443', 'Colonia M'),
+(15, 15, 'Calle 15', '1212', 'Ciudad O', '22334', 'Colonia L'),
+(18, 21, 'Eten', '612-A', 'CDMX', '07730', 'San Bartolo Atepehuacan'),
+(19, 21, 'Rayuel', '320', 'CDMX', '09878', 'Churubusco');
+
+INSERT INTO detalles_compra (id, id_compra, id_producto, cantidad_comprada) VALUES
+(8, 7, 14, 13),
+(9, 7, 4, 8),
+(10, 8, 8, 8);
+
+INSERT INTO users (id, nombre, correo, tipo, contrasenia, salt) VALUES
+(19, 'Mariano Peña Romero', 'mariano.pena15@gmail.com', 'administrador', '1070782220a60f7d5d3177114e400c52eba418260734f38c117d7a6415ef6e0c', '2ba1e14c0e9bbf77d7447881371cb1a4'),
+(21, 'Tania', 'tann07lee04@gmail.com', 'cliente', '0e2d7e5008063fe7edd958f19ecee9e5a7031acc7093a0340a5ebbb3617fd0fa', 'e223246e25b04a8b402884c4f19645ac'),
+(26, 'Jorge Ramirez Lopez', 'antonio33@gmail.com', 'editor', '5a3a1c2408cd199f8c32994f35091c142194cb3ed4f36ee44409be10846f653b', '467be222a31c5bd1d39d7f240632883a');
 COMMIT;
