@@ -22,18 +22,18 @@ paypal.configure({
 
 let userRole = null //Variable para el rol del usuario
 
-app.set('trust proxy', 1) // trust first proxy
+app.set('trust proxy', 1)
 
 app.use(session( { //Manejo de sesiones
-    secret: process.env.SECRET_SESSION, // Clave secreta para firmar la sesión (debería ser una cadena segura)
-    resave: false, // Evita que la sesión se guarde en el almacén en cada solicitud
-    saveUninitialized: false, // Evita que se cree una sesión no inicializada en la solicitud
+    secret: process.env.SECRET_SESSION, // Clave secreta para firmar la sesión.
+    resave: false, // Evita que la sesión se guarde en el almacén en cada solicitud.
+    saveUninitialized: false, // Evita que se cree una sesión no inicializada en la solicitud.
 }))
 
 app.use((req, res, next) => {
-    if (req.session.usuario) { // Si el usuario ha iniciado sesión, obtén su rol desde la sesión
-        userName = req.session.usuario.nombre //Asuminedo que la sesion tiene el nombre del usuario logeado
-        userRole = req.session.usuario.tipo // Asumiendo que la sesión contiene el rol del usuario
+    if (req.session.usuario) {
+        userName = req.session.usuario.nombre
+        userRole = req.session.usuario.tipo
     } else {  // Si no ha iniciado sesión se establece un predeterminado
         userRole = "invitado"
     }
@@ -51,7 +51,7 @@ const dbConfig = { // Base de datos configuración y acceso
 
 const connection = mysql.createConnection(dbConfig)
 
-connection.connect((err) => {
+connection.connect((err) => { //Se intenta la conexion a la base de datos
     if (err) {
         console.error('Error de conexión a la base de datos:', err)
         return
@@ -61,21 +61,17 @@ connection.connect((err) => {
 
 module.exports = connection
 
-// Configurar EJS como motor de plantillas
-app.set('view engine', 'ejs')
-// Establecer la ubicación de las plantillas EJS
-app.set('views', path.join(__dirname, 'views'))
-// Middleware para servir archivos estáticos (como CSS, imágenes, etc.)
-app.use(express.static(path.join(__dirname, 'public')))
-// Configurar multer para manejar la carga de archivos
-const uploadDirectory = 'public/images'
+app.set('view engine', 'ejs')// Configurar EJS como motor de plantillas
+app.set('views', path.join(__dirname, 'views'))// Establecer la ubicación de las plantillas EJS
+app.use(express.static(path.join(__dirname, 'public'))) // Middleware para servir archivos estáticos (como CSS, imágenes, etc.)
+const uploadDirectory = 'public/images'// Configurar multer para manejar la carga de archivos
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, uploadDirectory);
+        cb(null, uploadDirectory)
     },
     filename: (req, file, cb) => {
-        cb(null, file.originalname) // Usa el nombre original del archivo
+        cb(null, file.originalname)
     },
 })
 
@@ -83,7 +79,7 @@ const upload = multer({ storage })
 
 // Ruta para la página de inicio (index.ejs)
 app.get('/', (req, res) => {
-    res.locals.userRole = userRole //Variable local para tomar el rol del usuario
+    res.locals.userRole = userRole
     res.render('index', {
         pageTitle: 'Rincon Paramo',
     })
@@ -91,7 +87,7 @@ app.get('/', (req, res) => {
 
 //Ruta pagina conocenos
 app.get('/conocenos', (req, res) => {
-    res.locals.userRole = userRole //Variable local para tomar el rol del usuario
+    res.locals.userRole = userRole
     res.render('conocenos', {
         pageTitle: 'Sobre nosotros',
     })
@@ -99,7 +95,7 @@ app.get('/conocenos', (req, res) => {
 
 // Ruta para la página de inicio de sesión (login.ejs)
 app.get('/login', (req, res) => {
-    res.locals.userRole = userRole; //Variable local para tomar el rol del usuario
+    res.locals.userRole = userRole
     res.render('login', {
         pageTitle: 'Iniciar Sesión',
         error: null,
@@ -111,23 +107,20 @@ app.post('/login', (req, res) => {
     const correo = req.body.correo
     const contrasenia = req.body.contrasenia
     res.locals.userRole = userRole
-    // Buscar el usuario por correo en la base de datos
     const sql = 'SELECT * FROM users WHERE correo = ?'
     connection.query(sql, [correo], (err, results) => {
         if (err) {
             console.error('Error al consultar la base de datos:', err)
-            res.redirect('/login'); // Manejo de error
+            res.redirect('/login')
         } else if (results.length === 1) {
             const usuario = results[0]
             const salt = usuario.salt
             const conPass = contrasenia + salt
             const hashContrasenia = createHash('sha256').update(conPass).digest('hex')
-            // Comparar la contraseña proporcionada con la almacenada
-            if (hashContrasenia === usuario.contrasenia) {
-                // Contraseña válida, crear una sesión para el usuario
+            if (hashContrasenia === usuario.contrasenia) { // Contraseña válida, crear una sesión para el usuario
                 console.log("Se inicio sesion exitosamente!!!")
                 req.session.usuario = usuario
-                res.redirect('/') // Redirigir a pagina principal del usuario
+                res.redirect('/')
             } else {
                 console.log('Contraseña incorrecta:', contrasenia)
                 res.locals.error = 'Contraseña incorrecta';
@@ -135,9 +128,7 @@ app.post('/login', (req, res) => {
                     pageTitle: 'Contraseña incorrecta',
                     error: 'Contraseña incorrecta',
                     userRole: userRole 
-                });
-                //console.log('Contraseña incorrecta:', contrasenia)
-                //res.redirect('/login/?error=invalid') // Contraseña incorrecta
+                })
             }
         } else {
             console.log('Correo electrónico no encontrado:', correo);
@@ -147,8 +138,6 @@ app.post('/login', (req, res) => {
                 error: 'Correo no encontrado',
                 userRole: userRole,
              })
-            //console.log('Correo electrónico no encontrado:', correo)
-            //res.redirect('/login/?error=notfound') // Correo electrónico no encontrado
         }
     })
 })
@@ -159,9 +148,8 @@ app.get("/cerrar", (req, res) => {
         if (err) {
             console.error('Error al cerrar la sesión:', err);
         } else {
-            // Redirige al usuario a una página de inicio de sesión o a la página principal
             console.log('Cerrado de sesion exitoso!!!')
-            res.redirect('/'); // Cambia '/login' a la ruta que desees
+            res.redirect('/')
         }
     })
 })
@@ -328,7 +316,7 @@ app.post('/perfil/direcciones/agregar', (req, res) => {
         const { calle, numero_exterior, ciudad, cp, colonia } = req.body
 
         // Inserta la nueva dirección en la base de datos
-        const sql = 'INSERT INTO direcciones (id_usuario, calle, numero_exterior, ciudad, cp, colonia) VALUES (?, ?, ?, ?, ?, ?)';
+        const sql = 'INSERT INTO direcciones (id_usuario, calle, numero_exterior, ciudad, cp, colonia) VALUES (?, ?, ?, ?, ?, ?)'
         connection.query(sql, [userId, calle, numero_exterior, ciudad, cp, colonia], (err, result) => {
             if (err) {
                 console.error('Error al agregar dirección:', err)
@@ -393,17 +381,13 @@ app.post('/perfil/direcciones/modificar/:userID/:direccionId', (req, res) => {
 
 //Ruta para eliminar la direccion seleccionada
 app.post('/perfil/direcciones/eliminar', (req, res) => {
-    // Obtén el ID de la dirección a eliminar desde el formulario
     const direccionId = req.body.direccionId
-
-    // Realiza una consulta SQL para eliminar la dirección con el ID proporcionado
     const sql = 'DELETE FROM direcciones WHERE id = ?'
     connection.query(sql, [direccionId], (err, result) => {
         if (err) {
             console.error('Error al eliminar la dirección:', err)
             res.status(500).send('Error interno del servidor')
         } else {
-            // Redirige al usuario de vuelta a la página de direcciones después de eliminar
             console.log("Direccion borrada exitosamente!!!")
             res.redirect('/perfil/direcciones')
         }
@@ -412,7 +396,7 @@ app.post('/perfil/direcciones/eliminar', (req, res) => {
 
 //Ruta para modificar contraseña render
 app.get('/perfil/modificar/contrasenia', (req, res) => {
-    if (req.session.usuario) { // Asegúrate de que el usuario esté autenticado
+    if (req.session.usuario) {
         res.locals.userRole = userRole
         const user = req.session.usuario
         res.render('modificarContrasenia', {
@@ -421,7 +405,7 @@ app.get('/perfil/modificar/contrasenia', (req, res) => {
             userRole: userRole
         })
     } else {
-        res.redirect('/login') // Redirige al usuario a la página de inicio de sesión si no está autenticado
+        res.redirect('/login')
     }
 })
 
@@ -431,9 +415,8 @@ app.post('/perfil/modificar/contrasenia', (req, res) => {
         const userId = req.session.usuario.id
         const newPassword = req.body.password
         const confirmPassword = req.body.confirmPassword
-
         // Validación de las contraseñas
-        if (!newPassword || newPassword.length < 8) {
+        if (!newPassword || newPassword.length < 8) { //Primera validacion
             console.log('No se realizo el cambio de contraseña...')
             user = req.session.usuario
             userRole = req.session.usuario.tipo
@@ -442,8 +425,7 @@ app.post('/perfil/modificar/contrasenia', (req, res) => {
                 userRole: userRole
             })
         }
-
-        if (newPassword !== confirmPassword) {
+        if (newPassword !== confirmPassword) { //Segunda validacion
             return res.render('modificarContrasenia', {
                 pageTitle: 'Modificar Contraseña',
                 user: req.session.usuario,
@@ -452,9 +434,7 @@ app.post('/perfil/modificar/contrasenia', (req, res) => {
         }
         const salt = crypto.randomBytes(16).toString('hex')
         const conPass = newPassword + salt
-        // Genera un hash de la nueva contraseña con SHA-256
         const hash = createHash('sha256').update(conPass).digest('hex')
-        // Actualiza la contraseña (hash) en la base de datos
         const sql = 'UPDATE users SET contrasenia = ?, salt = ? WHERE id = ?'
         connection.query(sql, [hash, salt, userId], (err, result) => {
             if (err) {
@@ -475,7 +455,6 @@ app.get('/perfil/compras', (req, res) => {
     if (req.session.usuario) {
         const userRole = req.session.usuario.tipo
         const userId = req.session.usuario.id
-        // Realiza una consulta para obtener las compras y productos comprados del usuario
         const sql = `
         SELECT c.id AS compra_id, c.fecha_compra, p.id AS producto_id, p.nombre, p.precio, dc.cantidad_comprada, c.total, c.id_direccion, d.calle, d.cp, d.ciudad, d.colonia, d.numero_exterior
         FROM compras c
@@ -489,10 +468,10 @@ app.get('/perfil/compras', (req, res) => {
                 console.error('Error al obtener compras:', err)
                 return res.status(500).send('Error interno del servidor')
             }
-            // Organiza los datos en una estructura adecuada para la vista
+            // Organiza los datos en una estructura
             const comprasConProductos = []
             let compraActual = null
-            for (const row of compras) { //Organiza las comrpas registradas el usuario
+            for (const row of compras) { //Organiza las comrpas registradas del usuario
                 if (!compraActual || compraActual.compra_id !== row.compra_id) {
                     compraActual = {
                         compra_id: row.compra_id,
@@ -533,15 +512,12 @@ app.post('/perfil/compras/mostrarProductos', (req, res) => {
     if (req.session.usuario) {
         const userId = req.session.usuario.id
         const compraId = req.body.compraId
-
-        // Realiza una consulta para obtener los productos comprados en la compra especificada
         const sql = 'SELECT p.nombre, pc.cantidad_comprada FROM productos_compras pc JOIN productos p ON pc.id_producto = p.id WHERE pc.id_compra = ?'
         connection.query(sql, [compraId], (err, productosComprados) => {
             if (err) {
                 console.error('Error al obtener productos comprados:', err)
                 return res.status(500).send('Error interno del servidor')
             }
-
             res.json({ productos: productosComprados })
         })
     } else {
@@ -554,18 +530,15 @@ app.get('/carrito', (req, res) => {
     if (req.session.usuario) {
         res.locals.userRole = userRole
         const userId = req.session.usuario.id
-        // Realiza una consulta para obtener los productos en el carrito del usuario
         const sql = `SELECT p.id, p.nombre, p.descripcion, p.precio, p.imagen, p.stock, c.cantidad
         FROM carrito c
         JOIN productos p ON c.id_producto = p.id
         WHERE c.id_usuario = ?;`
-
         connection.query(sql, [userId], (err, productosEnCarrito) => {
             if (err) {
                 console.error('Error al obtener productos en el carrito:', err)
                 return res.status(500).send('Error interno del servidor')
             }
-            // Renderiza la página del carrito y pasa los productos al template
             res.render('carrito', {
                 pageTitle: 'Carrito de Compras',
                 carrito: productosEnCarrito
@@ -580,18 +553,14 @@ app.get('/carrito', (req, res) => {
 app.post('/agregarAlCarrito', (req, res) => {
     if (req.session.usuario) {
         const userId = req.session.usuario.id
-        const productId = req.body.productId // Suponiendo que tienes un campo en el formulario con el ID del producto
-        const cantidad = req.body.cantidad // Suponiendo que tienes un campo en el formulario para la cantidad
-
-        // Insertar el producto en la tabla "carrito"
+        const productId = req.body.productId 
+        const cantidad = req.body.cantidad
         const sql = `INSERT INTO carrito (id_usuario, id_producto, cantidad, fecha_creacion) VALUES (?, ?, ?, NOW())`
-
         connection.query(sql, [userId, productId, cantidad], (err) => {
             if (err) {
                 console.error('Error al agregar el producto al carrito:', err)
                 return res.status(500).send('Error interno del servidor')
             }
-            // Redirige al usuario a la página del producto u otra página de confirmación
             console.log("Producto agregado al carrito exitosamente!!!")
             res.redirect('/carrito')
         })
@@ -605,16 +574,13 @@ app.post('/actualizarCantidadEnCarrito/:id', (req, res) => {
     if (req.session.usuario) {
         const userId = req.session.usuario.id
         const productoId = req.params.id
-        const nuevaCantidad = req.body.cantidad // Asegúrate de que el nombre del campo en el formulario sea 'cantidad'
-        // Realiza la actualización de la cantidad en la tabla 'carrito'
+        const nuevaCantidad = req.body.cantidad
         const sql = 'UPDATE carrito SET cantidad = ? WHERE id_usuario = ? AND id_producto = ?'
-
         connection.query(sql, [nuevaCantidad, userId, productoId], (err, result) => {
             if (err) {
                 console.error('Error al actualizar la cantidad en el carrito:', err)
                 return res.status(500).send('Error interno del servidor')
             }
-            // Redirecciona de nuevo al carrito
             res.redirect('/carrito')
         })
     } else {
@@ -627,93 +593,13 @@ app.post('/eliminarDelCarrito/:id', (req, res) => {
     if (req.session.usuario) {
         const userId = req.session.usuario.id
         const productoId = req.params.id
-        // Realiza la eliminación del producto del carrito
         const sql = 'DELETE FROM carrito WHERE id_usuario = ? AND id_producto = ?'
-
         connection.query(sql, [userId, productoId], (err, result) => {
             if (err) {
                 console.error('Error al eliminar el producto del carrito:', err)
                 return res.status(500).send('Error interno del servidor')
             }
-
-            // Redirecciona de nuevo al carrito
             res.redirect('/carrito')
-        })
-    } else {
-        res.status(403).send('Acceso no autorizado')
-    }
-})
-
-// Ruta para realizar la compra con los productos en el carrito
-app.post('/realizarCompra', (req, res) => {
-    if (req.session.usuario && req.session.direccionSeleccionada) {
-        const userId = req.session.usuario.id;
-        const direccionSeleccionada = req.session.direccionSeleccionada;
-        // Paso 1: Crear una nueva compra en la tabla "compras"
-        const sql1 = 'INSERT INTO compras (id_usuario, id_direccion, fecha_compra) VALUES (?, ?, NOW())'
-        connection.query(sql1 , [userId, direccionSeleccionada], (err, result) => {
-            if (err) {
-                console.error('Error al crear la compra:', err);
-                return res.status(500).send('Error interno del servidor')
-            }
-            const compraId = result.insertId; // ID de la compra recién creada
-            // Paso 2: Obtener los productos en el carrito del usuario, incluyendo el precio
-            const sql2 = 'SELECT c.id_producto, c.cantidad, p.precio, p.nombre FROM carrito c JOIN productos p ON c.id_producto = p.id WHERE c.id_usuario = ?'
-            connection.query(sql2, [userId], (err, productosEnCarrito) => {
-                if (err) {
-                    console.error('Error al obtener productos en el carrito:', err)
-                    return res.status(500).send('Error interno del servidor')
-                }
-                // Paso 3: Copiar los productos del carrito a "detalles_compra" con el ID de la compra
-                const detallesCompraValues = productosEnCarrito.map(producto => [compraId, producto.id_producto, producto.cantidad])
-                connection.query('INSERT INTO detalles_compra (id_compra, id_producto, cantidad_comprada) VALUES ?', [detallesCompraValues], (err) => {
-                    if (err) {
-                        console.error('Error al copiar los productos a detalles_compra:', err)
-                        return res.status(500).send('Error interno del servidor')
-                    }
-                    // Paso 4: Calcular el total de la compra
-                    const totalCompra = productosEnCarrito.reduce((total, producto) => {
-                        return total + producto.precio * producto.cantidad
-                    }, 0)
-                    // Paso 5: Actualizar el total de la compra en la tabla "compras"
-                    connection.query('UPDATE compras SET total = ? WHERE id = ?', [totalCompra, compraId], (err) => {
-                        if (err) {
-                            console.error('Error al actualizar el total de la compra:', err)
-                            return res.status(500).send('Error interno del servidor')
-                        }
-                        // Paso 6: Actualizar el stock de productos restando la cantidad comprada y luego eliminar los productos del carrito
-                        const updateStockQueries = productosEnCarrito.map(producto => {
-                            return new Promise((resolve, reject) => {
-                                // Actualizar el stock restando la cantidad comprada
-                                connection.query('UPDATE productos SET stock = stock - ? WHERE id = ?', [producto.cantidad, producto.id_producto], (err) => {
-                                    if (err) {
-                                        console.error('Error al actualizar el stock del producto:', err)
-                                        reject(err)
-                                    } else {
-                                        resolve()
-                                    }
-                                })
-                            })
-                        })
-                        // Ejecutar todas las actualizaciones del stock en paralelo
-                        Promise.all(updateStockQueries)
-                            .then(() => {
-                                // Paso 7: Eliminar los productos del carrito
-                                connection.query('DELETE FROM carrito WHERE id_usuario = ?', [userId], (err) => {
-                                    if (err) {
-                                        console.error('Error al eliminar productos del carrito:', err)
-                                        return res.status(500).send('Error interno del servidor')
-                                    }
-                                    // Paso 8: Redirigir al usuario a una página de confirmación o recibo
-                                    res.redirect('/perfil/compras')
-                                })
-                            })
-                            .catch((err) => {
-                                return res.status(500).send('Error interno del servidor')
-                            })
-                    })
-                })
-            })
         })
     } else {
         res.status(403).send('Acceso no autorizado')
@@ -722,7 +608,7 @@ app.post('/realizarCompra', (req, res) => {
 
 // Ruta para los productos
 app.get('/productos', (req, res) => {
-    res.locals.userRole = userRole //Variable local para tomar el rol del usuario
+    res.locals.userRole = userRole
     const sql = 'SELECT * FROM productos'
     connection.query(sql, (err, results) => {
         if (err) {
@@ -739,7 +625,7 @@ app.get('/productos', (req, res) => {
 
 // Ruta para agregar productos (GET)
 app.get('/productos/agregar', (req, res) => {
-    res.locals.userRole = userRole //Variable local para tomar el rol del usuario
+    res.locals.userRole = userRole
     if(req.session.usuario && (req.session.usuario.tipo == "editor" || req.session.usuario.tipo == "administrador")) { //Si el usuario ha iniciado sesion y tiene un rango de este tipo
     // Recupera las categorías existentes desde la base de datos
     const sqlCategorias = 'SELECT DISTINCT categoria FROM productos'
@@ -757,7 +643,6 @@ app.get('/productos/agregar', (req, res) => {
                 res.status(500).send('Error interno del servidor')
                 return
             }
-            // Renderiza el formulario de agregar producto con las categorías y marcas existentes
             res.render('aproducts', {
                 pageTitle: 'Agregar Producto',
                 categorias: categorias,
@@ -765,7 +650,7 @@ app.get('/productos/agregar', (req, res) => {
             })
         })
     })
-    } else { //Si el usuario no ha iniciado sesion o no tiene el rango correspondiente
+    } else {
         res.status(403).send('Acceso denegado')
     }
 })
@@ -774,42 +659,35 @@ app.get('/productos/agregar', (req, res) => {
 app.post('/productos/agregar', upload.single('imagen'), (req, res) => {
     const { nombre, precio, stock, categoria, nueva_categoria, marca, nueva_marca, descripcion } = req.body
     const imagePath = req.file ? req.file.path : null
-
-    // Redimensionar la imagen a 1200x1200 px con sharp
-    if (imagePath) {
+    if (imagePath) { // Redimensionar la imagen a 1200x1200 px con sharp
         sharp(imagePath)
             .resize(1200, 1200)
             .toFile(`${imagePath}-resized`, (err, info) => {
                 if (err) {
                     console.error('Error al redimensionar la imagen:', err)
                     res.status(500).send('Error al procesar la imagen')
-                    return;
+                    return
                 }
-
-                // Elimina la imagen original si existe
-                if (fs.existsSync(imagePath)) {
-                    fs.unlinkSync(imagePath);
+                if (fs.existsSync(imagePath)) { // Elimina la imagen original si existe
+                    fs.unlinkSync(imagePath)
                 }
                 // Construye la nueva ruta de la imagen basada en la categoría y el nombre del producto
-                const categoriaProducto = categoria || nueva_categoria;
-                const nombreProducto = nombre.toLowerCase().replace(/\s+/g, '-'); // Convierte espacios en guiones
+                const categoriaProducto = categoria || nueva_categoria
+                const nombreProducto = nombre.toLowerCase().replace(/\s+/g, '-') // Convierte espacios en guiones
                 const nuevaRutaImagen = `public/images/${categoriaProducto}/${nombreProducto}.jpg`
-
                 // Renombra y mueve la imagen redimensionada al nuevo directorio
                 fs.renameSync(`${imagePath}-resized`, nuevaRutaImagen)
-
                 // Modifica la ruta para que sea relativa
                 const rutaRelativaImagen = nuevaRutaImagen.replace(/^public\//, '')
-
                 // Guarda la dirección de la imagen en la base de datos (como rutaRelativaImagen)
                 const sql = 'INSERT INTO productos (nombre, precio, stock, categoria, marca, descripcion, imagen) VALUES (?, ?, ?, ?, ?, ?, ?)'
                 connection.query(sql, [nombre, precio, stock, categoria || nueva_categoria, marca || nueva_marca, descripcion, rutaRelativaImagen], (err, result) => {
                     if (err) {
                         console.error('Error al agregar el producto:', err)
                         res.status(500).send('Error interno del servidor')
-                        return;
+                        return
                     }
-                    console.log("Producto agregado exitosamente!!!") //Se efectuo el registro del producto de manera satisfactoria
+                    console.log("Producto agregado exitosamente!!!")
                     res.redirect('/productos')
                 })
             })
@@ -829,9 +707,8 @@ app.post('/productos/agregar', upload.single('imagen'), (req, res) => {
 
 // Página de detalles del producto
 app.get('/productos/:productoId', (req, res) => {
-    res.locals.userRole = userRole; //Variable local para tomar el rol del usuario
+    res.locals.userRole = userRole
     const productoId = req.params.productoId
-    // Consulta la base de datos para obtener la información del producto con el ID proporcionado
     connection.query('SELECT * FROM productos WHERE id = ?', [productoId], (err, results) => {
         if (err) {
             console.error('Error al recuperar los detalles del producto:', err)
@@ -854,18 +731,17 @@ app.get('/productos/:productoId', (req, res) => {
 // Ruta para mostrar el formulario de edición protegido (GET)
 app.get('/productos/:productoId/editar', (req, res) => {
     if (req.session.usuario && (req.session.usuario.tipo === "editor" || req.session.usuario.tipo === "administrador")) {
-        res.locals.userRole = userRole  //Variable local para tomar el rol del usuario
+        res.locals.userRole = userRole 
         const productoId = req.params.productoId
-        // Consulta la base de datos para obtener la información del producto con el ID proporcionado
         connection.query('SELECT * FROM productos WHERE id = ?', [productoId], (err, results) => {
             if (err) {
                 console.error('Error al recuperar los detalles del producto:', err)
                 res.status(500).send('Error interno del servidor')
-                return;
+                return
             }
             if (results.length === 0) {
                 res.status(404).send('Producto no encontrado')
-                return;
+                return
             }
             const product = results[0]
             res.render('editarProducto', {
@@ -883,7 +759,6 @@ app.post('/productos/:productoId/editar', (req, res) => {
     if (req.session.usuario && (req.session.usuario.tipo === "editor" || req.session.usuario.tipo === "administrador")) {
         const productoId = req.params.productoId
         const { nombre, categoria, stock, descripcion, precio, marca } = req.body
-
         // Consulta para actualizar la información del producto (sin la imagen)
         connection.query(
             'UPDATE productos SET nombre = ?, stock = ?, descripcion = ?, precio = ?, marca = ? WHERE id = ?',
@@ -908,14 +783,12 @@ app.post('/productos/:productoId/editar', (req, res) => {
 app.post('/productos/:productoId/eliminar', (req, res) => {
     if (req.session.usuario && req.session.usuario.tipo === "administrador") {
         const productoId = req.params.productoId
-        // Consulta para eliminar el producto
         connection.query('DELETE FROM productos WHERE id = ?', [productoId], (err, results) => {
             if (err) {
                 console.error('Error al eliminar el producto:', err)
                 res.status(500).send('Error interno del servidor')
                 return
             }
-            // Redirige al usuario a la página de productos con una alerta de éxito
             console.log("Producto eliminado exitosamente!!!")
             res.redirect('/productos')
         })
@@ -928,7 +801,6 @@ app.post('/productos/:productoId/eliminar', (req, res) => {
 app.get('/usuarios', (req, res) => {
     if (req.session.usuario && req.session.usuario.tipo === "administrador") {
         res.locals.userRole = userRole
-        // Consulta para obtener todos los usuarios
         connection.query("SELECT * FROM users", (err, results) => {
             if (err) {
                 console.error('Error al recuperar los usuarios:', err)
@@ -939,7 +811,6 @@ app.get('/usuarios', (req, res) => {
             const usuariosAdmin = results.filter(user => user.tipo === 'administrador')
             const usuariosCliente = results.filter(user => user.tipo === 'cliente')
             const usuariosEditor = results.filter(user => user.tipo === 'editor')
-            
             res.render('usuarios', {
                 pageTitle: 'Usuarios',
                 usuariosAdmin: usuariosAdmin,
@@ -948,71 +819,58 @@ app.get('/usuarios', (req, res) => {
             })
         })
     } else {
-        // No cumple los parámetros de acceso
         res.status(403).send('Acceso denegado')
     }
 })
 
 app.get('/checkout', (req, res) => {
     if (req.session.usuario) {
-        // Recupera el ID del usuario logeado
         const idUsuario = req.session.usuario.id
         res.locals.userRole = userRole
-        // Realiza una consulta SQL para obtener las direcciones del usuario logeado
         const sql = "SELECT * FROM direcciones WHERE id_usuario = ?";
         connection.query(sql, [idUsuario], (error, results) => {
             if (error) {
-                // Maneja el error de la consulta
                 console.error(error)
-                res.status(500).send("Error al recuperar las direcciones del usuario.");
+                res.status(500).send("Error al recuperar las direcciones del usuario.")
             } else {
-                // Si la consulta fue exitosa, los resultados contendrán las direcciones del usuario
                 const direcciones = results
-
-                // Renderiza la página con las direcciones del usuario
                 res.render('creacionCompra', { 
                     direcciones,
                     pageTitle: "Checkout" })
             }
         })
     } else {
-        // Maneja el caso en el que el usuario no está autenticado
-        res.redirect('/login') // Redirige al usuario a la página de inicio de sesión, por ejemplo
+        res.redirect('/login')
     }
 })
 
+//Ruta para renderizado de pagina de pago
 app.get('/pago', (req, res) => {
     if (req.session.usuario) {
         // Recupera la dirección seleccionada de la sesión (asegúrate de que esté almacenada previamente)
         const direccionSeleccionadaId = req.session.direccionSeleccionada
         res.locals.userRole = userRole
-        // Realiza una consulta a la base de datos para obtener los datos de la dirección
         const sql = 'SELECT * FROM direcciones WHERE id = ?'
         connection.query(sql, [direccionSeleccionadaId], (error, results) => {
             if (error) {
-                // Maneja el error, por ejemplo, mostrando un mensaje de error o redirigiendo al usuario.
-                //console.log("Aqui esta el error")
-                console.error(error);
+                console.error(error)
             } else {
-                // Los datos de la dirección están en results[0] (suponiendo que solo se espera un resultado)
                 const direccionSeleccionada = results[0]
-
                 res.render('pago', {
-                    direccionSeleccionada, // Pasar la dirección seleccionada como variable local
+                    direccionSeleccionada,
                     pageTitle: "Método de Pago"
-                });
+                })
             }
-        });
+        })
     } else {
-        res.redirect('/login') // Redirige al usuario
+        res.redirect('/login') 
     }
 })
 
+ //URI para seleccionar la direccion al momento de elegir el metodo de pago
 app.post('/seleccionarDireccion', (req, res) => {
-    const direccionSeleccionada = req.body.direccion_envio;
-    // Aquí debes procesar la dirección seleccionada y guardarla en la sesión o la base de datos según tus necesidades.
+    const direccionSeleccionada = req.body.direccion_envio
     req.session.direccionSeleccionada = direccionSeleccionada
-    // Después de procesar la selección, redirige al usuario a la página de Método de Pago.
     res.redirect('/pago')
 })
 
@@ -1028,7 +886,7 @@ app.post('/pay', (req, res) => {
             } else {
                 const items = []
                 var total = 0
-                productosEnCarrito.forEach((producto) => {
+                productosEnCarrito.forEach((producto) => { //Creacion de arreglo con estructura json con los productos en el carrito
                     const item = {
                         name: producto.nombre,
                         sku: producto.id_producto.toString(),
@@ -1036,7 +894,7 @@ app.post('/pay', (req, res) => {
                         currency: "MXN",
                         quantity: producto.cantidad.toString(),
                     }
-                    total += producto.precio * producto.cantidad;
+                    total += producto.precio * producto.cantidad
                     items.push(item)
                 })
                 req.session.total = total
@@ -1060,7 +918,6 @@ app.post('/pay', (req, res) => {
                         "description": "Compra realizada en rincon paramo!!!"
                     }]
                 }
-
                 paypal.payment.create(create_payment_json, function (error, payment) {
                     if (error) {
                         throw error
@@ -1074,20 +931,21 @@ app.post('/pay', (req, res) => {
                 })
             }
         })
-        console.log("Entrada a API Paypal")
+        console.log("Entrada a API Paypal...")
 })
 
+//En caso de que se cancele la operacion de Paypal
 app.get('/cancel', (req, res) => {
     res.locals.userRole = userRole
     res.send('Cancelled')
 })
 
+//En case de que sea saisfactoria la operacion de Paypal
 app.get('/success', (req, res) => {
     res.locals.userRole = userRole
-    const payerId = req.query.PayerID;
-    const paymentId = req.query.paymentId;
+    const payerId = req.query.PayerID
+    const paymentId = req.query.paymentId
     console.log(req.session.total)
-  
     const execute_payment_json = {
       "payer_id": payerId,
       "transactions": [{
@@ -1096,24 +954,26 @@ app.get('/success', (req, res) => {
               "total": req.session.total,
           }
       }]
-    };
+    }
     paypal.payment.execute(paymentId, execute_payment_json, function (error, payment) {
       if (error) {
-          console.log(error.response)
-          throw error
+        console.log("El pago ha sido rechazado!!!")
+        console.log(error.response)
+        throw error
       } else {
-          console.log(JSON.stringify(payment))
+          //console.log(JSON.stringify(payment))
+          console.log("El pago se ha autorizado!!!")
           if (req.session.usuario && req.session.direccionSeleccionada) {
             const userId = req.session.usuario.id;
-            const direccionSeleccionada = req.session.direccionSeleccionada;
+            const direccionSeleccionada = req.session.direccionSeleccionada
             // Paso 1: Crear una nueva compra en la tabla "compras"
             const sql1 = 'INSERT INTO compras (id_usuario, id_direccion, fecha_compra) VALUES (?, ?, NOW())'
             connection.query(sql1 , [userId, direccionSeleccionada], (err, result) => {
                 if (err) {
-                    console.error('Error al crear la compra:', err);
+                    console.error('Error al crear la compra:', err)
                     return res.status(500).send('Error interno del servidor')
                 }
-                const compraId = result.insertId; // ID de la compra recién creada
+                const compraId = result.insertId // ID de la compra recién creada
                 // Paso 2: Obtener los productos en el carrito del usuario, incluyendo el precio
                 const sql2 = 'SELECT c.id_producto, c.cantidad, p.precio, p.nombre FROM carrito c JOIN productos p ON c.id_producto = p.id WHERE c.id_usuario = ?'
                 connection.query(sql2, [userId], (err, productosEnCarrito) => {
@@ -1175,12 +1035,10 @@ app.get('/success', (req, res) => {
         } else {
             res.status(403).send('Acceso no autorizado')
         }
-        //res.send('Success')
       }
     })
 })
 
-// Iniciar el servidor para escuchar las peticiones
-app.listen(process.env.PORT, () => {
-    console.log(`Servidor en el puerto ${process.env.PORT}`)
+app.listen(process.env.PORT, () => { // Se inicia el servidor
+    console.log(`Servidor a la espera en el puerto ${process.env.PORT}`)
 })
