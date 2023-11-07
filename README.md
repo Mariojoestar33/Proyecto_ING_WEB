@@ -1,5 +1,5 @@
-# Proyecto_ING_WEB
-Proyecto Ingeniería Web 24/1
+# Proyecto Ingenieria Web UPIITA 24/1
+Proyect Ingeniería Web
 
 ### Version
 
@@ -23,6 +23,8 @@ You will need to install all the dependencies after you download it.
 ```sh
 $ npm install
 ```
+
+### Database and credentials
 
 You will also need to create the DB with the file **rincon.sql** and create your **.env** file with all your credentials.
 
