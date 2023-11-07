@@ -5,6 +5,7 @@ const mysql = require('mysql')
 const multer = require('multer')
 const sharp = require('sharp')
 const fs = require('fs')
+const crypto = require('crypto') //Encriptacion
 const { createHash } = require('crypto') //Encriptacion
 const bodyParser = require('body-parser') //Para poder leer los datos de formularios
 const paypal = require('paypal-rest-sdk') //Paypal
@@ -118,7 +119,9 @@ app.post('/login', (req, res) => {
             res.redirect('/login'); // Manejo de error
         } else if (results.length === 1) {
             const usuario = results[0]
-            const hashContrasenia = createHash('sha256').update(contrasenia).digest('hex')
+            const salt = usuario.salt
+            const conPass = contrasenia + salt
+            const hashContrasenia = createHash('sha256').update(conPass).digest('hex')
             // Comparar la contraseña proporcionada con la almacenada
             if (hashContrasenia === usuario.contrasenia) {
                 // Contraseña válida, crear una sesión para el usuario
@@ -187,10 +190,12 @@ app.post('/registro', (req, res) => {
             return res.status(400).send('La contraseña debe tener 8 caracteres (minimos) o las contraseñas no coinciden.')
         }
         try {  
-            const hash = createHash('sha256').update(contrasenia).digest('hex')
-            const sql = 'INSERT INTO users (nombre, correo, tipo, contrasenia) VALUES (?, ?, ?, ?)'
+            const salt = crypto.randomBytes(16).toString('hex')
+            const conPass = contrasenia + salt
+            const hash = createHash('sha256').update(conPass).digest('hex')
+            const sql = 'INSERT INTO users (nombre, correo, tipo, contrasenia, salt) VALUES (?, ?, ?, ?, ?)'
             
-            connection.query(sql, [nombre, correo, tipo, hash], (err, resultado) => { 
+            connection.query(sql, [nombre, correo, tipo, hash, salt], (err, resultado) => { 
                 if (err) {
                     console.error('Error al registrar usuario:', err)
                     return res.status(500).send('Error interno del servidor')
@@ -215,10 +220,12 @@ app.post('/registro', (req, res) => {
             return res.status(400).send('La contraseña debe tener 8 caracteres (minimos) o las contraseñas no coinciden.')
         }
         try {  
-            const hash = createHash('sha256').update(contrasenia).digest('hex')
-            const sql = 'INSERT INTO users (nombre, correo, tipo, contrasenia) VALUES (?, ?, ?, ?)'
+            const salt = crypto.randomBytes(16).toString('hex')
+            const conPass = contrasenia + salt
+            const hash = createHash('sha256').update(conPass).digest('hex')
+            const sql = 'INSERT INTO users (nombre, correo, tipo, contrasenia, salt) VALUES (?, ?, ?, ?, ?)'
             
-            connection.query(sql, [nombre, correo, tipo, hash], (err, resultado) => { 
+            connection.query(sql, [nombre, correo, tipo, hash, salt], (err, resultado) => { 
                 if (err) {
                     console.error('Error al registrar usuario:', err)
                     return res.status(500).send('Error interno del servidor')
@@ -443,11 +450,13 @@ app.post('/perfil/modificar/contrasenia', (req, res) => {
                 error: 'Las contraseñas no coinciden.'
             })
         }
+        const salt = crypto.randomBytes(16).toString('hex')
+        const conPass = newPassword + salt
         // Genera un hash de la nueva contraseña con SHA-256
-        const hash = createHash('sha256').update(newPassword).digest('hex')
+        const hash = createHash('sha256').update(conPass).digest('hex')
         // Actualiza la contraseña (hash) en la base de datos
-        const sql = 'UPDATE users SET contrasenia = ? WHERE id = ?'
-        connection.query(sql, [hash, userId], (err, result) => {
+        const sql = 'UPDATE users SET contrasenia = ?, salt = ? WHERE id = ?'
+        connection.query(sql, [hash, salt, userId], (err, result) => {
             if (err) {
                 console.error('Error al actualizar la contraseña:', err)
                 res.status(500).send('Error interno del servidor')
