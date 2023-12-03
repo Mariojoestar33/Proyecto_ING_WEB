@@ -28,7 +28,7 @@ $ npm install
 
 You will also need to create the DB with the file **rincon.sql** and create your **.env** file with all your credentials.
 
-### Serve
+### Usage
 
 For normal start
 
