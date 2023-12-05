@@ -9,7 +9,11 @@
         <% } else if(userRole == "editor") { %>
         <li><a href="/productos/agregar">Agregar</a></li>
         <li><a href="/productosAdmin">Productos</a></li>
-        <li><a href="/cerrar">Cerrar Sesion</a></li>
+        <li class="activadorSub"><a href="/perfil"><%= userName %></a>
+            <ul class="submenu">
+                <li><a href="/cerrar">Cerrar Sesion</a></li>
+            </ul>
+        </li>
         <% } else if(userRole == "administrador") { %>
         <li class="activadorSub"><a href="/productosAdmin">Productos</a>
             <!--<ul class="submenu">
