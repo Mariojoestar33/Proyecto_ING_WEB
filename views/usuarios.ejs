@@ -25,7 +25,9 @@
                                 <td class="col-4"><%= user.correo %></td>
                                 <td class="col-4">
                                     <a href="/usuarios/<%= user.id %>/editar" class="btn btn-warning btn-sm">Editar</a>
-                                    <a href="/usuarios/<%= user.id %>/eliminar" class="btn btn-danger btn-sm">Eliminar</a>
+                                    <% if(usuario.nombre != user.nombre) { %> 
+                                        <a href="/usuarios/<%= user.id %>/eliminar" class="btn btn-danger btn-sm">Eliminar</a>
+                                    <%} %>
                                 </td>
                             </tr>
                         <% }); %>

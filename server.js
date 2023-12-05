@@ -648,6 +648,9 @@ app.get('/productosAdmin', (req, res) => {
                 products: results,
             })
         })
+    } else {
+        console.error("No cuentas con permisos!!!")
+        res.status(403).send('Acceso denegado');
     }
 })
 
@@ -880,7 +883,9 @@ app.post('/productos/:productoId/eliminar', (req, res) => {
 //Ruta para usuarios
 app.get('/usuarios', (req, res) => {
     if (req.session.usuario && req.session.usuario.tipo === "administrador") {
+        const usuario = req.session.usuario
         res.locals.userRole = userRole
+        res.locals.userName = userName
         connection.query("SELECT * FROM users", (err, results) => {
             if (err) {
                 console.error('Error al recuperar los usuarios:', err)
@@ -896,6 +901,7 @@ app.get('/usuarios', (req, res) => {
                 usuariosAdmin: usuariosAdmin,
                 usuariosCliente: usuariosCliente,
                 usuariosEditor: usuariosEditor,
+                usuario: usuario,
             })
         })
     } else {
