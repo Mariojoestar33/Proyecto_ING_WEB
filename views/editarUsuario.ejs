@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<%- include('head') %>
+<body>
+    <header>
+        <%- include('navbar') %>
+    </header>
+    <div class="container">
+        <h1 class="titulo">Editar Usuario</h1>
+        <h1 class="titulo"><%= usuario.nombre %></h1>
+        <form action="/usuarios/<%= usuario.id %>/editar" method="POST" class="formulario">
+
+            <!-- Nombre -->
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" value="<%= usuario.nombre %>">
+
+            <!-- Correo -->
+            <label for="correo">Correo:</label>
+            <input type="email" id="correo" name="correo" value="<%= usuario.correo %>">
+
+            <!-- Tipo (agrega más campos según tus necesidades) -->
+            <% if (usuario.tipo !== 'administrador') { %>
+                <label for="tipo">Tipo:</label>
+                <select id="tipo" name="tipo">
+                    <option value="editor" <%= usuario.tipo === 'editor' ? 'selected' : '' %>>Editor</option>
+                    <option value="cliente" <%= usuario.tipo === 'cliente' ? 'selected' : '' %>>Cliente</option>
+                </select>
+            <% } else { %>
+                <p>Tipo: Administrador (No se puede modificar)</p>
+                <input type="hidden" name="tipo" value="<%= usuario.tipo %>">
+            <% } %>
+
+            <!-- Botón para modificar -->
+            <button type="submit" class="btn btn-warning" style="width: 100%;">Modificar</button>
+        </form>
+    </div>
+    <%- include('footer', { currentYear: new Date().getFullYear() }) %>
+</body>
+</html>

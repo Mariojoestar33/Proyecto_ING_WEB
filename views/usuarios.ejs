@@ -8,39 +8,75 @@
         <div class="container">
             <h1 class="titulo">Usuarios Totales (<%= usuariosAdmin.length + usuariosEditor.length + usuariosCliente.length %>)</h1>
             <div class="centrar">
+                <a href="/registro" class="btn btn-primary btn-sm mx-auto" style="display: flex; justify-content: center;">Agregar Usuario</a>
                 <h2>Administradores (<%= usuariosAdmin.length%>)</h2>
-                <ul>
-                    <% usuariosAdmin.forEach((user) => { %>
-                        <br>
-                        <li>
-                            Nombre: <%= user.nombre %> </br> Correo: <%= user.correo %><br>
-                            <a href="/usuarios/<%= user.id %>/editar" class="btn btn-warning">Editar</a>
-                            <a href="/usuarios/<%= user.id %>/eliminar" class="btn btn-danger">Eliminar</a>
-                        </li>
-                    <% }); %>
-                </ul>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="col-4">Nombre</th>
+                            <th class="col-4">Correo</th>
+                            <th class="col-4">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% usuariosAdmin.forEach((user) => { %>
+                            <tr>
+                                <td class="col-4"><%= user.nombre %></td>
+                                <td class="col-4"><%= user.correo %></td>
+                                <td class="col-4">
+                                    <a href="/usuarios/<%= user.id %>/editar" class="btn btn-warning btn-sm">Editar</a>
+                                    <a href="/usuarios/<%= user.id %>/eliminar" class="btn btn-danger btn-sm">Eliminar</a>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+
                 <h2>Editores (<%= usuariosEditor.length%>)</h2>
-                <ul>
-                    <% usuariosEditor.forEach((user) => {  %>
-                        <br>
-                        <li>
-                            Nombre: <%= user.nombre %> </br> Correo: <%= user.correo %><br>
-                            <a href="/usuarios/<%= user.id %>/editar" class="btn btn-warning">Editar</a>
-                            <a href="/usuarios/<%= user.id %>/eliminar" class="btn btn-danger">Eliminar</a>
-                        </li>
-                    <% }); %>
-                </ul>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="col-4">Nombre</th>
+                            <th class="col-4">Correo</th>
+                            <th class="col-4">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% usuariosEditor.forEach((user) => {  %>
+                            <tr>
+                                <td class="col-4"><%= user.nombre %></td>
+                                <td class="col-4"><%= user.correo %></td>
+                                <td class="col-4">
+                                    <a href="/usuarios/<%= user.id %>/editar" class="btn btn-warning btn-sm">Editar</a>
+                                    <a href="/usuarios/<%= user.id %>/eliminar" class="btn btn-danger btn-sm">Eliminar</a>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+
                 <h2>Clientes (<%= usuariosCliente.length%>)</h2>
-                <ul>
-                    <% usuariosCliente.forEach((user) => {%>
-                        <br>
-                        <li>
-                            Nombre: <%= user.nombre %> </br> Correo: <%= user.correo %><br>
-                            <a href="/usuarios/<%= user.id %>/editar" class="btn btn-warning">Editar</a>
-                            <a href="/usuarios/<%= user.id %>/eliminar" class="btn btn-danger">Eliminar</a>
-                        </li>
-                    <% }); %>
-                </ul>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="col-4">Nombre</th>
+                            <th class="col-4">Correo</th>
+                            <th class="col-4">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% usuariosCliente.forEach((user) => {%>
+                            <tr>
+                                <td class="col-4"><%= user.nombre %></td>
+                                <td class="col-4"><%= user.correo %></td>
+                                <td class="col-4">
+                                    <a href="/usuarios/<%= user.id %>/editar" class="btn btn-warning btn-sm">Editar</a>
+                                    <a href="/usuarios/<%= user.id %>/eliminar" class="btn btn-danger btn-sm">Eliminar</a>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
             </div>
         </div>
         <%- include('footer', { currentYear: new Date().getFullYear() }) %>

@@ -75,7 +75,16 @@ const storage = multer.diskStorage({
     },
 })
 
-const upload = multer({ storage })
+const fileFilter = (req, file, cb) => {
+    // Verifica que la extensión del archivo sea jpg o png
+    if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+        cb(null, true);
+    } else {
+        cb(new Error('Formato de archivo no admitido. Solo se permiten archivos jpg o png.'), false);
+    }
+}
+
+const upload = multer({ storage: storage, fileFilter: fileFilter})
 
 // Ruta para la página de inicio (index.ejs)
 app.get('/', (req, res) => {
@@ -623,6 +632,76 @@ app.get('/productos', (req, res) => {
     })
 })
 
+// Ruta para los productos
+app.get('/productosAdmin', (req, res) => {
+    res.locals.userRole = userRole
+    if(req.session.usuario && (req.session.usuario.tipo == "editor" || req.session.usuario.tipo == "administrador")) {
+        const sql = 'SELECT * FROM productos'
+        connection.query(sql, (err, results) => {
+            if (err) {
+                console.error('Error al recuperar los productos:', err)
+                res.status(500).send('Error interno del servidor')
+                return
+            }
+            res.render('productosAdmin', {
+                pageTitle: 'Productos Administrador',
+                products: results,
+            })
+        })
+    }
+})
+
+// Ruta para mostrar el formulario de edición protegido (GET)
+app.get('/usuarios/:usuarioId/editar', (req, res) => {
+    res.locals.userRole = userRole
+    if (req.session.usuario && (req.session.usuario.tipo === "editor" || req.session.usuario.tipo === "administrador")) {
+        const usuarioId = req.params.usuarioId;
+        connection.query('SELECT * FROM users WHERE id = ?', [usuarioId], (err, results) => {
+            if (err) {
+                console.error('Error al recuperar los detalles del usuario:', err);
+                res.status(500).send('Error interno del servidor');
+                return;
+            }
+            if (results.length === 0) {
+                res.status(404).send('Usuario no encontrado');
+                return;
+            }
+            const usuario = results[0];
+            res.render('editarUsuario', {
+                pageTitle: `Editar ${usuario.nombre}`,
+                usuario,
+            });
+        });
+    } else {
+        res.status(403).send('Acceso denegado');
+    }
+});
+
+// Ruta para procesar la actualización protegida (POST)
+app.post('/usuarios/:usuarioId/editar', (req, res) => {
+    res.locals.userRole = userRole
+    if (req.session.usuario && (req.session.usuario.tipo === "editor" || req.session.usuario.tipo === "administrador")) {
+        const usuarioId = req.params.usuarioId;
+        const { nombre, correo, tipo } = req.body;
+
+        connection.query(
+            'UPDATE users SET nombre = ?, correo = ?, tipo = ? WHERE id = ?',
+            [nombre, correo, tipo, usuarioId],
+            (err, results) => {
+                if (err) {
+                    console.error('Error al actualizar el usuario:', err);
+                    res.status(500).send('Error interno del servidor');
+                    return;
+                }
+                console.log("Usuario actualizado exitosamente!!!");
+                res.redirect(`/usuarios`);
+            }
+        );
+    } else {
+        res.status(403).send('Acceso denegado');
+    }
+});
+
 // Ruta para agregar productos (GET)
 app.get('/productos/agregar', (req, res) => {
     res.locals.userRole = userRole
@@ -673,6 +752,7 @@ app.post('/productos/agregar', upload.single('imagen'), (req, res) => {
                 }
                 // Construye la nueva ruta de la imagen basada en la categoría y el nombre del producto
                 const categoriaProducto = categoria || nueva_categoria
+                categoriaProducto = categoriaProducto.toLowerCase()
                 const nombreProducto = nombre.toLowerCase().replace(/\s+/g, '-') // Convierte espacios en guiones
                 const nuevaRutaImagen = `public/images/${categoriaProducto}/${nombreProducto}.jpg`
                 // Renombra y mueve la imagen redimensionada al nuevo directorio

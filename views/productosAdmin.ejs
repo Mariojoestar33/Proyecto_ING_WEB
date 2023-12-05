@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+    <%- include('head') %>
+    <body>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="js/filtro.js"></script>
+        <script>
+            // Función para confirmar la eliminación
+            function confirmDelete(productId) {
+                if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+                    // Redirige al usuario para eliminar el producto
+                    window.location.href = `/productos/${productId}/eliminar`;
+                }
+            }
+        </script>
+        <header>
+            <%- include('navbar') %>
+        </header>
+        <div class="container">
+            <h1 class="titulo">Productos<% if(userRole == "administrador" || userRole == "editor") { %> totales (<%= products.length %>)<% } %></h1>
+            <br>
+            <a href="/productos/agregar" class="btn btn-primary btn-sm mx-auto" style="display: flex; justify-content: center;">Agregar Producto</a>
+            <table class="table table-fixed">
+                <thead>
+                    <tr>
+                        <th class="col-2">Imagen</th>
+                        <th class="col-2">Nombre</th>
+                        <th class="col-2">Categoría</th>
+                        <th class="col-2">Stock</th>
+                        <th class="col-2">Precio</th>
+                        <% if (userRole === "administrador") { %>
+                            <th class="col-2">Acciones</th>
+                        <% } else if (userRole === "editor") { %>
+                            <th class="col-2">Editar</th>
+                        <% } %>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% products.forEach((product) => { %>
+                        <tr>
+                            <td class="col-2">
+                                <a href="/productos/<%= product.id %>" method="get">
+                                    <img src="<%= product.imagen %>" alt="Imagen del producto" style="max-width: 100px;">
+                                </a>
+                            </td>
+                            <td class="col-2"><%= product.nombre %></td>
+                            <td class="col-2"><%= product.categoria %></td>
+                            <td class="col-2">
+                                <% if (product.stock <= 0) { %>
+                                    Sin stock
+                                <% } else { %>
+                                    <%= product.stock %>
+                                <% } %>
+                            </td>
+                            <td class="col-2">$<%= product.precio %></td>
+                            <% if (userRole === "administrador") { %>
+                                <td class="col-2">
+                                    <a href="/productos/<%= product.id %>/editar" class="btn btn-warning">Editar</a>
+                                    <form action="/productos/<%= product.id %>/eliminar" method="post">
+                                        <input type="hidden" name="productoId" value="<%= product.id %>">
+                                        <button type="submit" class="btn btn-danger" onclick="confirmDelete('<%= product.id %>')">Eliminar</button>
+                                    </form>
+                                </td>
+                            <% } else if (userRole === "editor") { %>
+                                <td class="col-2">
+                                    <a href="/productos/<%= product.id %>/editar" class="btn btn-warning">Editar</a>
+                                </td>
+                            <% } %>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+        <%- include('footer', { currentYear: new Date().getFullYear() }) %>
+    </body>
+</html>
