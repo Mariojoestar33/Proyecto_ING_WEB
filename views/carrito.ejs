@@ -9,6 +9,7 @@
             <h1 class="titulo">Carrito de Compras</h1>
             <br>
             <ul>
+                <% let totalPagar = 0; %>
                 <% carrito.forEach(producto => { %>
                     <div class="carritoVista">
                         <li>
@@ -23,6 +24,7 @@
                             </form>
                             Precio unitario: $<%= producto.precio %><br>
                             Subtotal: $<%= producto.precio * producto.cantidad %><br>
+                            <% totalPagar += producto.precio * producto.cantidad; %>
                             <form action="/eliminarDelCarrito/<%= producto.id %>" method="post">
                                 <button type="submit" class="btn btn-danger">Eliminar del Carrito</button>
                             </form>
@@ -32,12 +34,12 @@
                     <br>
                 <% }) %>
             </ul>
-
             <% if (carrito.length > 0) { %>
-                <!--<form action="/realizarCompra" method="post" class="formulario">
-                    <button type="submit" class="btn btn-primary">Realizar Compra</button>
-                </form>-->
-                <a href="/Checkout" class="btn btn-primary" id="btnCheckout">Realizar Compra</a>
+                <div style="text-align: center;"> <!-- Agrega un div para centrar -->
+                    <a href="/Checkout" class="btn btn-primary" id="btnCheckout">
+                        Realizar Compra - Total: $<%= totalPagar.toFixed(2) %>
+                    </a>
+                </div>
             <% } else { %>
                 <p style="text-align: center;">No hay nada en el carrito</p>
             <% } %>
