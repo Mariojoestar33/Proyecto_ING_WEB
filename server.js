@@ -10,6 +10,8 @@ const { createHash } = require('crypto') //Encriptacion
 const bodyParser = require('body-parser') //Para poder leer los datos de formularios
 const paypal = require('paypal-rest-sdk') //Paypal
 
+let i = 1
+
 const app = express()
 
 require("dotenv").config() //Se añade el archivo de configuracion de datos para privacidad
@@ -705,6 +707,29 @@ app.post('/usuarios/:usuarioId/editar', (req, res) => {
     }
 });
 
+// Ruta para procesar la eliminación protegida (POST)
+app.post('/usuarios/:usuarioId/eliminar', (req, res) => {
+    res.locals.userRole = userRole
+    if (req.session.usuario && (req.session.usuario.tipo === "editor" || req.session.usuario.tipo === "administrador")) {
+        const usuarioId = req.params.usuarioId
+        connection.query(
+            'DELETE FROM users WHERE id = ?',
+            [usuarioId],
+            (err, results) => {
+                if (err) {
+                    console.error('Error al eliminar el usuario:', err)
+                    res.status(500).send('Error interno del servidor')
+                    return
+                }
+                console.log("Usuario eliminado exitosamente!!!")
+                res.redirect(`/usuarios`)
+            }
+        )
+    } else {
+        res.status(403).send('Acceso denegado')
+    }
+})
+
 // Ruta para agregar productos (GET)
 app.get('/productos/agregar', (req, res) => {
     res.locals.userRole = userRole
@@ -750,16 +775,26 @@ app.post('/productos/agregar', upload.single('imagen'), (req, res) => {
                     res.status(500).send('Error al procesar la imagen')
                     return
                 }
-                if (fs.existsSync(imagePath)) { // Elimina la imagen original si existe
+                /*if (fs.existsSync(imagePath)) { // Elimina la imagen original si existe
                     fs.unlinkSync(imagePath)
-                }
+                }*/
                 // Construye la nueva ruta de la imagen basada en la categoría y el nombre del producto
-                const categoriaProducto = categoria || nueva_categoria
+                
+
+
+
+                let categoriaProducto = categoria || nueva_categoria
                 categoriaProducto = categoriaProducto.toLowerCase()
-                const nombreProducto = nombre.toLowerCase().replace(/\s+/g, '-') // Convierte espacios en guiones
-                const nuevaRutaImagen = `public/images/${categoriaProducto}/${nombreProducto}.jpg`
+                const nombreProducto = nombre.toLowerCase().replace(/\s+/g, '-')// Convierte espacios en guiones
+                const nuevaRutaImagen = `public/images/${categoriaProducto}/${nombreProducto}-${i}.jpg`
                 // Renombra y mueve la imagen redimensionada al nuevo directorio
-                fs.renameSync(`${imagePath}-resized`, nuevaRutaImagen)
+                if (fs.existsSync(`${imagePath}-resized`)) {
+                    fs.renameSync(`${imagePath}-resized`, nuevaRutaImagen)  
+            } else {
+                    console.error(`No se encontro el archivo temporal...`)
+            }
+                // Renombra y mueve la imagen redimensionada al nuevo directorio
+                //fs.renameSync(`${imagePath}-resized`, nuevaRutaImagen)
                 // Modifica la ruta para que sea relativa
                 const rutaRelativaImagen = nuevaRutaImagen.replace(/^public\//, '')
                 // Guarda la dirección de la imagen en la base de datos (como rutaRelativaImagen)
@@ -770,6 +805,7 @@ app.post('/productos/agregar', upload.single('imagen'), (req, res) => {
                         res.status(500).send('Error interno del servidor')
                         return
                     }
+                    i++
                     console.log("Producto agregado exitosamente!!!")
                     res.redirect('/productos')
                 })
@@ -864,17 +900,23 @@ app.post('/productos/:productoId/editar', (req, res) => {
 
 // Ruta para procesar la eliminación de un producto (POST)
 app.post('/productos/:productoId/eliminar', (req, res) => {
-    if (req.session.usuario && req.session.usuario.tipo === "administrador") {
+    res.locals.userRole = userRole
+    if (req.session.usuario && (req.session.usuario.tipo === "editor" || req.session.usuario.tipo === "administrador")) {
         const productoId = req.params.productoId
-        connection.query('DELETE FROM productos WHERE id = ?', [productoId], (err, results) => {
-            if (err) {
-                console.error('Error al eliminar el producto:', err)
-                res.status(500).send('Error interno del servidor')
-                return
+        connection.query(
+            'DELETE FROM productos WHERE id = ?',
+            [productoId],
+            (err, results) => {
+                if (err) {
+                    console.error('Error al eliminar el usuario:', err)
+                    res.status(500).send('Error interno del servidor')
+                    return
+                }
+                console.log(productoId)
+                console.log("Producto eliminado exitosamente!!!")
+                res.redirect(`/productosAdmin`)
             }
-            console.log("Producto eliminado exitosamente!!!")
-            res.redirect('/productos')
-        })
+        )
     } else {
         res.status(403).send('Acceso denegado')
     }
