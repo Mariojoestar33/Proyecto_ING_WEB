@@ -23,7 +23,7 @@
                             <li>
                                 <%= direccion.calle %>, <%= direccion.numero_exterior %>, <%= direccion.colonia %>, <%= direccion.ciudad %>, <%= direccion.cp %>
                                 <a href="/perfil/direcciones/modificar/<%= direccion.id_usuario %>/<%= direccion.id %>">Modificar</a>
-                                <form action="/perfil/direcciones/eliminar" method="post">
+                                <form action="/perfil/direcciones/eliminar" method="post" onsubmit="return confirmDelete()">
                                     <input type="hidden" name="direccionId" value="<%= direccion.id %>">
                                     <button type="submit" class="btn btn-primary">Eliminar</button>
                                 </form>
@@ -34,5 +34,10 @@
             </div>
         </div>
         <%- include('footer', { currentYear: new Date().getFullYear() })%>
+        <script>
+            function confirmDelete() {
+                return confirm('¿Estás seguro de que deseas eliminar esta dirección?');
+            }
+        </script>
     </body>
 </html>

@@ -326,6 +326,12 @@ app.post('/perfil/direcciones/agregar', (req, res) => {
         const userId = req.session.usuario.id
         const { calle, numero_exterior, ciudad, cp, colonia } = req.body
 
+        // Validar que ninguno de los campos esté vacío
+        if (!calle || !numero_exterior || !ciudad || !cp || !colonia) {
+            res.status(400).send('Todos los campos son obligatorios')
+            return
+        }
+
         // Inserta la nueva dirección en la base de datos
         const sql = 'INSERT INTO direcciones (id_usuario, calle, numero_exterior, ciudad, cp, colonia) VALUES (?, ?, ?, ?, ?, ?)'
         connection.query(sql, [userId, calle, numero_exterior, ciudad, cp, colonia], (err, result) => {
@@ -368,7 +374,7 @@ app.get('/perfil/direcciones/modificar/:userID/:direccionId', (req, res) => {
     }
 })
 
-//Ruta para modificar la direccion
+// Ruta para modificar la dirección
 app.post('/perfil/direcciones/modificar/:userID/:direccionId', (req, res) => {
     // Manejar la modificación de la dirección y actualizar la base de datos
     const direccionId = req.params.direccionId
@@ -377,6 +383,12 @@ app.post('/perfil/direcciones/modificar/:userID/:direccionId', (req, res) => {
     const nuevaColonia = req.body.colonia
     const nuevaCiudad = req.body.ciudad
     const nuevoCP = req.body.cp
+
+    // Validar que ninguno de los campos esté vacío
+    if (!nuevaCalle || !nuevoNumeroExterior || !nuevaColonia || !nuevaCiudad || !nuevoCP) {
+        res.status(400).send('Todos los campos son obligatorios')
+        return
+    }
 
     // Realizar una consulta SQL para actualizar los datos en la base de datos
     const sql = 'UPDATE direcciones SET calle = ?, numero_exterior = ?, colonia = ?, ciudad = ?, cp = ? WHERE id = ?'
