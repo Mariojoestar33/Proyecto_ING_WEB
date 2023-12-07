@@ -564,16 +564,59 @@ app.get('/carrito', (req, res) => {
 app.post('/agregarAlCarrito', (req, res) => {
     if (req.session.usuario) {
         const userId = req.session.usuario.id
-        const productId = req.body.productId 
-        const cantidad = req.body.cantidad
-        const sql = `INSERT INTO carrito (id_usuario, id_producto, cantidad, fecha_creacion) VALUES (?, ?, ?, NOW())`
-        connection.query(sql, [userId, productId, cantidad], (err) => {
-            if (err) {
-                console.error('Error al agregar el producto al carrito:', err)
+        const productId = req.body.productId
+        const cantidadSolicitada = parseInt(req.body.cantidad, 10)
+        // Obtener el stock disponible del producto
+        const obtenerStockQuery = 'SELECT stock FROM productos WHERE id = ?'
+        connection.query(obtenerStockQuery, [productId], (stockErr, stockResults) => {
+            if (stockErr) {
+                console.error('Error al obtener el stock del producto:', stockErr)
                 return res.status(500).send('Error interno del servidor')
             }
-            console.log("Producto agregado al carrito exitosamente!!!")
-            res.redirect('/carrito')
+            if (stockResults.length > 0) {
+                const stockDisponible = stockResults[0].stock
+                // Verificar si la cantidad solicitada supera el stock disponible
+                if (cantidadSolicitada > stockDisponible) {
+                    return res.status(400).send('La cantidad solicitada supera el stock disponible')
+                }
+                // Verificar si el producto ya está en el carrito del usuario
+                const checkIfExistsQuery = 'SELECT id, cantidad FROM carrito WHERE id_usuario = ? AND id_producto = ?'
+                connection.query(checkIfExistsQuery, [userId, productId], (checkErr, results) => {
+                    if (checkErr) {
+                        console.error('Error al verificar el producto en el carrito:', checkErr)
+                        return res.status(500).send('Error interno del servidor')
+                    }
+
+                    if (results.length > 0) {
+                        // El producto ya está en el carrito, actualizar la cantidad
+                        const existingCartItem = results[0]
+                        const updatedCantidad = Math.min(stockDisponible, parseInt(existingCartItem.cantidad, 10) + cantidadSolicitada)
+
+                        const updateQuery = 'UPDATE carrito SET cantidad = ? WHERE id = ?'
+                        connection.query(updateQuery, [updatedCantidad, existingCartItem.id], (updateErr) => {
+                            if (updateErr) {
+                                console.error('Error al actualizar la cantidad en el carrito:', updateErr)
+                                return res.status(500).send('Error interno del servidor')
+                            }
+                            console.log('Cantidad actualizada exitosamente en el carrito!!!')
+                            res.redirect('/carrito')
+                        })
+                    } else {
+                        // El producto no está en el carrito, insertar un nuevo registro
+                        const insertQuery = 'INSERT INTO carrito (id_usuario, id_producto, cantidad, fecha_creacion) VALUES (?, ?, ?, NOW())'
+                        connection.query(insertQuery, [userId, productId, cantidadSolicitada], (insertErr) => {
+                            if (insertErr) {
+                                console.error('Error al agregar el producto al carrito:', insertErr)
+                                return res.status(500).send('Error interno del servidor')
+                            }
+                            console.log('Producto agregado al carrito exitosamente!!!')
+                            res.redirect('/carrito')
+                        })
+                    }
+                })
+            } else {
+                res.status(404).send('Producto no encontrado')
+            }
         })
     } else {
         res.status(403).send('Acceso no autorizado')

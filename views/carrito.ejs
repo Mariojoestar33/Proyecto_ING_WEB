@@ -14,17 +14,17 @@
                     <div class="carritoVista">
                         <li>
                             Producto: <%= producto.nombre %><br>
-                            <form action="/actualizarCantidadEnCarrito/<%= producto.id %>" method="post">
-                                Cantidad: <select name="cantidad">
+                            <form id="form<%= producto.id %>" action="/actualizarCantidadEnCarrito/<%= producto.id %>" method="post">
+                                Cantidad: <select name="cantidad" onchange="submitForm('<%= producto.id %>')">
                                     <% for (let i = 1; i <= producto.stock; i++) { %>
                                         <option value="<%= i %>"<%= i === producto.cantidad ? ' selected' : '' %>><%= i %></option>
                                     <% } %>
                                 </select>
-                                <button type="submit" class="btn btn-primary">Actualizar Cantidad</button>
+                                <p>Precio unitario: $<%= producto.precio %><p>
+                                <p style="font-weight: bold;">Subtotal: $<%= producto.precio * producto.cantidad %></p>
+                                <% totalPagar += producto.precio * producto.cantidad; %>
+                                <!--<button type="submit" class="btn btn-primary">Actualizar Cantidad</button>-->
                             </form>
-                            Precio unitario: $<%= producto.precio %><br>
-                            Subtotal: $<%= producto.precio * producto.cantidad %><br>
-                            <% totalPagar += producto.precio * producto.cantidad; %>
                             <form action="/eliminarDelCarrito/<%= producto.id %>" method="post">
                                 <button type="submit" class="btn btn-danger">Eliminar del Carrito</button>
                             </form>
@@ -44,6 +44,13 @@
                 <p style="text-align: center;">No hay nada en el carrito</p>
             <% } %>
         </div>
+
+        <script>
+            function submitForm(productId) {
+                document.getElementById('form' + productId).submit();
+            }
+        </script>
+
         <%- include('footer', { currentYear: new Date().getFullYear() }) %>
     </body>
 </html>
