@@ -741,26 +741,33 @@ app.get('/usuarios/:usuarioId/editar', (req, res) => {
 app.post('/usuarios/:usuarioId/editar', (req, res) => {
     res.locals.userRole = userRole
     if (req.session.usuario && (req.session.usuario.tipo === "editor" || req.session.usuario.tipo === "administrador")) {
-        const usuarioId = req.params.usuarioId;
-        const { nombre, correo, tipo } = req.body;
+        const usuarioId = req.params.usuarioId
+        const { nombre, correo, tipo } = req.body
+
+        // Validación para asegurarse de que no haya campos en blanco
+        if (!nombre || !correo || !tipo) {
+            res.status(400).send('Todos los campos deben estar llenos')
+            return
+        }
 
         connection.query(
             'UPDATE users SET nombre = ?, correo = ?, tipo = ? WHERE id = ?',
             [nombre, correo, tipo, usuarioId],
             (err, results) => {
                 if (err) {
-                    console.error('Error al actualizar el usuario:', err);
-                    res.status(500).send('Error interno del servidor');
-                    return;
+                    console.error('Error al actualizar el usuario:', err)
+                    res.status(500).send('Error interno del servidor')
+                    return
                 }
-                console.log("Usuario actualizado exitosamente!!!");
-                res.redirect(`/usuarios`);
+                console.log("Usuario actualizado exitosamente!!!")
+                res.redirect(`/usuarios`)
             }
-        );
+        )
     } else {
-        res.status(403).send('Acceso denegado');
+        res.status(403).send('Acceso denegado')
     }
-});
+})
+
 
 // Ruta para procesar la eliminación protegida (POST)
 app.post('/usuarios/:usuarioId/eliminar', (req, res) => {
@@ -906,6 +913,7 @@ app.get('/productos/:productoId', (req, res) => {
 app.get('/productos/:productoId/editar', (req, res) => {
     if (req.session.usuario && (req.session.usuario.tipo === "editor" || req.session.usuario.tipo === "administrador")) {
         res.locals.userRole = userRole 
+        tipo = userRole
         const productoId = req.params.productoId
         connection.query('SELECT * FROM productos WHERE id = ?', [productoId], (err, results) => {
             if (err) {
@@ -921,6 +929,7 @@ app.get('/productos/:productoId/editar', (req, res) => {
             res.render('editarProducto', {
                 pageTitle: `Editar ${product.nombre}`,
                 product,
+                tipo,
             })
         })
     } else {
@@ -933,17 +942,24 @@ app.post('/productos/:productoId/editar', (req, res) => {
     if (req.session.usuario && (req.session.usuario.tipo === "editor" || req.session.usuario.tipo === "administrador")) {
         const productoId = req.params.productoId
         const { nombre, categoria, stock, descripcion, precio, marca } = req.body
+
+        // Verificar que todos los campos estén llenos
+        if (!nombre || !categoria || !stock || !descripcion || !precio || !marca) {
+            res.status(400).send('Todos los campos deben estar llenos')
+            return
+        }
+
         // Consulta para actualizar la información del producto (sin la imagen)
         connection.query(
-            'UPDATE productos SET nombre = ?, stock = ?, descripcion = ?, precio = ?, marca = ? WHERE id = ?',
-            [nombre, stock, descripcion, precio, marca, productoId],
+            'UPDATE productos SET nombre = ?, stock = ?, descripcion = ?, precio = ?, marca = ?, categoria = ? WHERE id = ?',
+            [nombre, stock, descripcion, precio, marca, categoria, productoId],
             (err, results) => {
                 if (err) {
                     console.error('Error al actualizar el producto:', err)
                     res.status(500).send('Error interno del servidor')
                     return
                 }
-                //Se actualizo satisfactoriamente el producto
+                // Se actualizó satisfactoriamente el producto
                 console.log("Producto actualizado exitosamente!!!")
                 res.redirect(`/productos/${productoId}`)
             }

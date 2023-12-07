@@ -10,6 +10,7 @@
                 <h1 class="titulo"><%= product.nombre %></h1>
                 <img class="imagenproducto" src="../<%= product.imagen %>" alt="<%= product.nombre %>">
                 <p><%= product.descripcion %></p>
+                <p>Marca: <%= product.marca %></p>
                 <% if (product.stock <= 0) { %>
                  <p>Sin stock disponible</p>
                 <% } else { %>
