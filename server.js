@@ -827,6 +827,11 @@ app.get('/productos/agregar', (req, res) => {
 // Ruta para agregar productos (POST)
 app.post('/productos/agregar', upload.single('imagen'), (req, res) => {
     const { nombre, precio, stock, categoria, nueva_categoria, marca, nueva_marca, descripcion } = req.body
+    // Verificar que todos los campos necesarios estén presentes
+    if (!nombre || !precio || !stock || !(categoria || nueva_categoria) || !(marca || nueva_marca) || !descripcion) {
+        res.status(400).send('Todos los campos, excepto la imagen, son obligatorios')
+        return
+    }
     const imagePath = req.file ? req.file.path : null
     if (imagePath) { // Redimensionar la imagen a 1200x1200 px con sharp
         sharp(imagePath)
@@ -837,14 +842,7 @@ app.post('/productos/agregar', upload.single('imagen'), (req, res) => {
                     res.status(500).send('Error al procesar la imagen')
                     return
                 }
-                /*if (fs.existsSync(imagePath)) { // Elimina la imagen original si existe
-                    fs.unlinkSync(imagePath)
-                }*/
                 // Construye la nueva ruta de la imagen basada en la categoría y el nombre del producto
-                
-
-
-
                 let categoriaProducto = categoria || nueva_categoria
                 categoriaProducto = categoriaProducto.toLowerCase()
                 const nombreProducto = nombre.toLowerCase().replace(/\s+/g, '-')// Convierte espacios en guiones
@@ -855,8 +853,6 @@ app.post('/productos/agregar', upload.single('imagen'), (req, res) => {
             } else {
                     console.error(`No se encontro el archivo temporal...`)
             }
-                // Renombra y mueve la imagen redimensionada al nuevo directorio
-                //fs.renameSync(`${imagePath}-resized`, nuevaRutaImagen)
                 // Modifica la ruta para que sea relativa
                 const rutaRelativaImagen = nuevaRutaImagen.replace(/^public\//, '')
                 // Guarda la dirección de la imagen en la base de datos (como rutaRelativaImagen)
