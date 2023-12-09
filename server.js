@@ -9,7 +9,16 @@ const crypto = require('crypto') //Encriptacion
 const { createHash } = require('crypto') //Encriptacion
 const bodyParser = require('body-parser') //Para poder leer los datos de formularios
 const paypal = require('paypal-rest-sdk') //Paypal
+const jwt = require('jsonwebtoken')
 
+const nodemailer = require('nodemailer')
+const transporter = nodemailer.createTransport( {
+    service: 'gmail',
+    auth: {
+        user: "mariano.pena15@gmail.com",
+        pass: "ntxe alud atpn gsik"
+    }
+})
 let i = 1
 
 const app = express()
@@ -102,6 +111,125 @@ app.get('/conocenos', (req, res) => {
     res.render('conocenos', {
         pageTitle: 'Sobre nosotros',
     })
+})
+
+//Ruta para recuperar la contraseña
+app.get('/forgotPassword', (req, res) => {
+    res.locals.userRole = userRole
+    res.render('forgotPassword', { 
+        pageTitle: 'Recuperar Contraseña',
+        userRole,
+    })
+})
+
+//Ruta recuperación
+app.post('/forgotPassword', async (req, res) => {
+    res.locals.userRole = userRole
+    //let userRole = userRole
+    const correo = req.body.correo;
+    const sql = 'SELECT * FROM users WHERE correo = ?';
+    connection.query(sql, [correo], (err, results) => {
+        if (err) {
+            console.error('Error al consultar la base de datos:', err);
+            res.redirect('/login');
+        } else if (results.length === 1) {
+            const user = results[0];
+
+            // Generar el token
+            const token = jwt.sign({ userRole: userRole }, 'tu_secreto', { expiresIn: '1h' });
+
+            const mailOptions = {
+                from: 'tu_correo@gmail.com',
+                to: correo,
+                subject: 'Recuperación de contraseña',
+                html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña: <a href="http://localhost:3000/reset-password?token=${token}&correo=${correo}">Restablecer contraseña</a></p>`
+            }
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.log(error);
+                    return res.status(500).send('Error al enviar el correo electrónico.');
+                }
+                console.log('Correo electrónico enviado: ' + info.response);
+                res.status(200).send('Correo electrónico enviado con éxito.');
+            });
+        } else {
+            console.log('Correo electrónico no encontrado:', correo);
+            res.locals.error = 'Correo electrónico no encontrado';
+            res.render('login', { 
+                pageTitle: 'Correo no encontrado',
+                error: 'Correo no encontrado',
+                userRole: userRole,
+            });
+        }
+    });
+});
+
+// Ruta para restablecer la contraseña
+app.get('/reset-password', (req, res) => {
+    const token = req.query.token // Obtener el token de la URL
+    const correo = req.query.correo // Obtener el tokencorreo de la URL
+    res.locals.userRole = userRole
+    console.log(userRole)
+    //console.log(token)
+    //console.log(correo)
+    // Verificar si el token es válido (puedes implementar lógica adicional según tus necesidades)
+    if (token && correo) {
+        res.render('resetPassword', {
+            pageTitle: 'Restablecer Contraseña',
+            token,
+            correo,
+        })
+    } else {
+        // Manejar caso en el que no hay token válido
+        res.status(400).send('Token inválido o expirado')
+    }
+})
+
+//Ruta para actualizar en base de datos la contraseña
+app.post('/reset-password', async (req, res) => {
+    res.locals.userRole = userRole
+    const token = req.body.token
+    const correo = req.body.correo
+    const contraseña = req.body.contrasenia
+    const confirmarcontraseña = req.body.confirmarcontrasenia
+    //console.log(token)
+    //console.log(correo)
+    // Validar longitud de la contraseña
+    if (contraseña.length < 8) {
+        return res.status(400).send('La contraseña debe tener al menos 8 caracteres.')
+    }
+    // Validar que la contraseña y la confirmación coincidan
+    if (contraseña !== confirmarcontraseña) {
+        return res.status(400).send('La contraseña y la confirmación no coinciden.')
+    }
+    try {
+        const decodedToken = jwt.decode(token, 'tu_secreto')
+        //console.log(decodedToken)
+        if (decodedToken.userRole && decodedToken.userRole === userRole) {
+            // Hash de la nueva contraseña antes de almacenarla
+            const salt = crypto.randomBytes(16).toString('hex')
+            const conPass = contraseña + salt
+            const hash = createHash('sha256').update(conPass).digest('hex')
+            // Actualizar la contraseña en la base de datos
+            const updateSql = 'UPDATE users SET contrasenia = ?, salt = ? WHERE correo = ?'
+            connection.query(updateSql, [hash, salt, correo], (updateErr, updateResults) => {
+                if (updateErr) {
+                    console.error('Error al actualizar la contraseña en la base de datos:', updateErr)
+                    res.status(500).send('Error al restablecer la contraseña')
+                } else {
+                    console.log("Se ha actualizado la contraseña con exito!!!")
+                    // Redirigir a la página de inicio de sesión o a donde sea apropiado
+                    res.redirect('/login');
+                }
+            })
+        } else {
+            // El correo del token no coincide con el correo proporcionado
+            res.status(400).send('Correo no válido para este token')
+        }
+    } catch (err) {
+        console.log("aqui jeje")
+        res.status(400).send('Token inválido o expirado')
+    }
 })
 
 // Ruta para la página de inicio de sesión (login.ejs)
