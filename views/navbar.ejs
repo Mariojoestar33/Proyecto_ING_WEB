@@ -3,7 +3,7 @@
         <li><a href="/"><image src = "/images/favicon.png"></image>Inicio</a></li>
         <li><a href="/conocenos">Conócenos</a></li>
         <% if (userRole == "cliente") { %>
-            <li><a href="/productos">Papeleria</a></li>
+            <li><a href="/productos">Papelería</a></li>
             <li><a href="/perfil"><%= userName %></a></li>
             <li><a href="/carrito"><img src="/images/cart.svg" alt="Carrito de compras" style="width: 20px;"></a></li>
         <% } else if(userRole == "editor") { %>
@@ -11,7 +11,7 @@
         <li><a href="/productosAdmin">Productos</a></li>
         <li class="activadorSub"><a href="/perfil"><%= userName %></a>
             <ul class="submenu">
-                <li><a href="/cerrar">Cerrar Sesion</a></li>
+                <li><a href="/cerrar">Cerrar Sesión</a></li>
             </ul>
         </li>
         <% } else if(userRole == "administrador") { %>
@@ -27,11 +27,11 @@
         </li>
         <li class="activadorSub"><a href="/perfil"><%= userName %></a>
             <ul class="submenu">
-                <li><a href="/cerrar">Cerrar Sesion</a></li>
+                <li><a href="/cerrar">Cerrar Sesión</a></li>
             </ul>
         </li>
         <% } else if(userRole == "invitado") { %>
-        <li><a href="/productos">Papeleria</a></li>
+        <li><a href="/productos">Papelería</a></li>
         <li><a href="/login">Login</a></li>
         <% } %>
     </ul>

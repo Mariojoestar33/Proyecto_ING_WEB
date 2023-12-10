@@ -8,15 +8,15 @@
         </header>
         <!--End of Navbar-->
         <!--Creacion de cuenta-->
-        <h1 class="titulo">Iniciar sesion</h1>
+        <h1 class="titulo">Iniciar sesión</h1>
         <form class="formulario" method="POST" action="/login">
             <div class="form-group">
                 <% if (pageTitle == error) { %>
                     <div class="alert alert-danger" style="text-align: center;">
-                        Error al iniciar sesion, contraseña o correo incorrecto. <br>
+                        Error al iniciar sesión, contraseña o correo incorrecto. <br>
                     </div>
                 <% } %>
-              <label for="exampleInputEmail1">Correo Electronico</label>
+              <label for="exampleInputEmail1">Correo Electrónico</label>
               <input type="email" class="form-control" id="correo" name="correo" aria-describedby="emailHelp" placeholder="tuCorreo@gmail.com">
             </div>
             <div class="form-group">
@@ -24,9 +24,9 @@
               <input type="password" class="form-control" id="contrasenia" name="contrasenia" placeholder="Password">
             </div>
         </br>
-            <button type="submit" class="btn btn-primary">Iniciar sesion</button>
-            <p><a class="link-opacity-75" href="/registro">No tienes cuenta? Registrate hoy mismo</a></p>
-            <p><a href="/forgotPassword" class="link-opacity-75">Olvidaste la contraseña???</a></p>
+            <button type="submit" class="btn btn-primary">Iniciar sesión</button>
+            <p><a class="link-opacity-75" href="/registro">¿No tienes cuenta? Registrate hoy mismo</a></p>
+            <p><a href="/forgotPassword" class="link-opacity-75">¿¿¿Olvidaste la contraseña???</a></p>
         </form>
         <!--End of form-->
         <!--Footer start-->
