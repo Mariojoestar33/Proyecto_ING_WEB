@@ -10,6 +10,7 @@ const { createHash } = require('crypto') //Encriptacion
 const bodyParser = require('body-parser') //Para poder leer los datos de formularios
 const paypal = require('paypal-rest-sdk') //Paypal
 const jwt = require('jsonwebtoken')
+const XLSX = require('xlsx')
 
 const nodemailer = require('nodemailer')
 const transporter = nodemailer.createTransport( {
@@ -1359,6 +1360,34 @@ app.get('/success', (req, res) => {
             res.status(403).send('Acceso no autorizado')
         }
       }
+    })
+})
+
+app.get('/exportar', (req, res) => {
+    // Lógica para obtener datos de ventas desde la base de datos
+    const query = `
+      SELECT c.id AS id_compra, c.fecha_compra, c.total, p.nombre AS nombre_producto, p.precio AS precio_producto, dc.cantidad_comprada
+      FROM compras c
+      JOIN detalles_compra dc ON c.id = dc.id_compra
+      JOIN productos p ON dc.id_producto = p.id
+    `
+    connection.query(query, (err, results) => {
+      if (err) throw err
+      // Crear un workbook y worksheet
+      const workbook = XLSX.utils.book_new()
+      const worksheet = XLSX.utils.json_to_sheet(results)
+      // Agregar el worksheet al workbook
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Ventas')
+      // Guardar el archivo Excel
+      const excelFilePath = 'ventas.xlsx';
+      console.log("Libro creado exitosamente!!!")
+      XLSX.writeFile(workbook, excelFilePath)
+      // Enviar el archivo Excel como respuesta
+      res.download(excelFilePath, 'ventasRincon.xlsx', (err) => {
+        if (err) throw err;
+        // Eliminar el archivo después de enviarlo
+        fs.unlinkSync(excelFilePath)
+      })
     })
 })
 

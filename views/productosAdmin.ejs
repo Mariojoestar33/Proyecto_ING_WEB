@@ -16,6 +16,8 @@
         <h1 class="titulo">Productos<% if(userRole == "administrador" || userRole == "editor") { %> totales (<%= products.length %>)<% } %></h1>
         <br>
         <a href="/productos/agregar" class="btn btn-primary btn-sm mx-auto" style="display: flex; justify-content: center;">Agregar Producto</a>
+        <br>
+        <a href="/exportar" class="btn btn-primary btn-sm mx-auto" style="display: flex; justify-content: center;">Exportar libro Excel</a>
         <table class="table table-fixed">
             <thead>
                 <tr>
