@@ -13,18 +13,20 @@ const jwt = require('jsonwebtoken')
 const XLSX = require('xlsx')
 
 const nodemailer = require('nodemailer')
-const transporter = nodemailer.createTransport( {
-    service: 'gmail',
-    auth: {
-        user: "mariano.pena15@gmail.com",
-        pass: "ntxe alud atpn gsik"
-    }
-})
+
 let i = 1
 
 const app = express()
 
 require("dotenv").config() //Se añade el archivo de configuracion de datos para privacidad
+
+const transporter = nodemailer.createTransport( {
+    service: 'gmail',
+    auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_SECRET
+    }
+})
 
 paypal.configure({
     'mode': process.env.MODE_PAYPAL,
