@@ -1039,9 +1039,10 @@ app.get('/productos/:productoId', (req, res) => {
 // Ruta para mostrar el formulario de edición protegido (GET)
 app.get('/productos/:productoId/editar', (req, res) => {
     if (req.session.usuario && (req.session.usuario.tipo === "editor" || req.session.usuario.tipo === "administrador")) {
-        res.locals.userRole = userRole 
-        tipo = userRole
+        res.locals.userRole = userRole
+        const tipo = userRole // Se corrigió para declarar la variable
         const productoId = req.params.productoId
+        // Consulta para obtener los detalles del producto
         connection.query('SELECT * FROM productos WHERE id = ?', [productoId], (err, results) => {
             if (err) {
                 console.error('Error al recuperar los detalles del producto:', err)
@@ -1053,14 +1054,36 @@ app.get('/productos/:productoId/editar', (req, res) => {
                 return
             }
             const product = results[0]
-            res.render('editarProducto', {
-                pageTitle: `Editar ${product.nombre}`,
-                product,
-                tipo,
+            // Consulta para obtener las categorías existentes
+            const sqlCategorias = 'SELECT DISTINCT nombre FROM categorias'
+            connection.query(sqlCategorias, (err, categorias) => {
+                if (err) {
+                    console.error('Error al recuperar categorías:', err)
+                    res.status(500).send('Error interno del servidor')
+                    return
+                }
+
+                // Consulta para obtener las marcas existentes
+                const sqlMarcas = 'SELECT DISTINCT nombre FROM marcas'
+                connection.query(sqlMarcas, (err, marcas) => {
+                    if (err) {
+                        console.error('Error al recuperar marcas:', err)
+                        res.status(500).send('Error interno del servidor')
+                        return
+                    }
+
+                    res.render('editarProducto', {
+                        pageTitle: `Editar ${product.nombre}`,
+                        product,
+                        tipo,
+                        categorias,
+                        marcas,
+                    })
+                })
             })
         })
     } else {
-        res.status(403).send('Acceso denegado')
+        res.status(403).send('Acceso denegado');
     }
 })
 
@@ -1365,32 +1388,131 @@ app.get('/success', (req, res) => {
     })
 })
 
+app.get('/marcas/agregar', (req, res) => {
+    res.locals.userRole = userRole
+    if (req.session.usuario && (req.session.usuario.tipo === "editor" || req.session.usuario.tipo === "administrador")) {
+        res.render('agregarMarca', {
+            pageTitle: "Nueva Marca",
+        })
+    } else {
+        console.log("Usuario sin permisos...")
+        res.status(403).send('Acceso no autorizado')
+    }
+})
+
+// Ruta para agregar una nueva categoría (POST)
+app.post('/marcas/agregar', (req, res) => {
+    res.locals.userRole = userRole
+    if (req.session.usuario && (req.session.usuario.tipo === "editor" || req.session.usuario.tipo === "administrador")) {
+        const nuevaMarcaNombre = req.body.marca
+        // Verifica si la categoría ya existe en la base de datos
+        connection.query('SELECT * FROM marcas WHERE nombre = ?', [nuevaMarcaNombre], (err, rows, fields) => {
+            if (err) {
+                console.error('Error al verificar la existencia de la categoría:', err)
+                return res.status(500).send('Error interno del servidor')
+            }
+            if (rows.length > 0) {
+                // La categoría ya existe
+                return res.status(400).send('La marca ya existe')
+            }
+            // Si no existe, crea la nueva categoría en la base de datos
+            connection.query('INSERT INTO marcas (nombre) VALUES (?)', [nuevaMarcaNombre], (err) => {
+                if (err) {
+                    console.error('Error al insertar la nueva marca:', err)
+                    return res.status(500).send('Error interno del servidor')
+                }
+                console.log("Marca agregada exitosamente!!!")
+                res.redirect('/productosAdmin') // Redirige a la página de agregar después de agregar la categoría
+            })
+        })
+    } else {
+        console.log("Usuario sin permisos...")
+        res.status(403).send('Acceso no autorizado')
+    }
+})
+
+app.get('/categorias/agregar', (req, res) => {
+    res.locals.userRole = userRole
+    if (req.session.usuario && (req.session.usuario.tipo === "editor" || req.session.usuario.tipo === "administrador")) {
+        res.render('agregarCategoria', {
+            pageTitle: "Nueva Categoria",
+        })
+    } else {
+        console.log("Usuario sin permisos...")
+        res.status(403).send('Acceso no autorizado')
+    }
+})
+
+// Ruta para agregar una nueva categoría (POST)
+app.post('/categorias/agregar', (req, res) => {
+    res.locals.userRole = userRole
+    if (req.session.usuario && (req.session.usuario.tipo === "editor" || req.session.usuario.tipo === "administrador")) {
+        const nuevaCategoriaNombre = req.body.categoria
+        // Verifica si la categoría ya existe en la base de datos
+        connection.query('SELECT * FROM categorias WHERE nombre = ?', [nuevaCategoriaNombre], (err, rows, fields) => {
+            if (err) {
+                console.error('Error al verificar la existencia de la categoría:', err)
+                return res.status(500).send('Error interno del servidor')
+            }
+            if (rows.length > 0) {
+                // La categoría ya existe
+                return res.status(400).send('La categoría ya existe')
+            }
+            // Si no existe, crea la nueva categoría en la base de datos
+            connection.query('INSERT INTO categorias (nombre) VALUES (?)', [nuevaCategoriaNombre], (err) => {
+                if (err) {
+                    console.error('Error al insertar la nueva categoría:', err)
+                    return res.status(500).send('Error interno del servidor')
+                }
+                // Verifica si la carpeta ya existe en el sistema de archivos
+                let nuevachikita = nuevaCategoriaNombre.toLowerCase()
+                const rutaCarpeta = `./public/images/${nuevachikita}`
+                if (!fs.existsSync(rutaCarpeta)) {
+                    // Si no existe, crea la carpeta
+                    fs.mkdirSync(rutaCarpeta)
+                }
+                console.log("Categoria agregada exitosamente!!!")
+                res.redirect('/productosAdmin') // Redirige a la página de agregar después de agregar la categoría
+            })
+        })
+    } else {
+        console.log("Usuario sin permisos...")
+        res.status(403).send('Acceso no autorizado')
+    }
+})
+
 app.get('/exportar', (req, res) => {
-    // Lógica para obtener datos de ventas desde la base de datos
+    res.locals.userRole = userRole
+    if (req.session.usuario && (req.session.usuario.tipo === "editor" || req.session.usuario.tipo === "administrador")) {
+        // Lógica para obtener datos de ventas desde la base de datos
     const query = `
-      SELECT c.id AS id_compra, c.fecha_compra, c.total, p.nombre AS nombre_producto, p.precio AS precio_producto, dc.cantidad_comprada
-      FROM compras c
-      JOIN detalles_compra dc ON c.id = dc.id_compra
-      JOIN productos p ON dc.id_producto = p.id
-    `
-    connection.query(query, (err, results) => {
-      if (err) throw err
-      // Crear un workbook y worksheet
-      const workbook = XLSX.utils.book_new()
-      const worksheet = XLSX.utils.json_to_sheet(results)
-      // Agregar el worksheet al workbook
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Ventas')
-      // Guardar el archivo Excel
-      const excelFilePath = 'ventas.xlsx';
-      console.log("Libro creado exitosamente!!!")
-      XLSX.writeFile(workbook, excelFilePath)
-      // Enviar el archivo Excel como respuesta
-      res.download(excelFilePath, 'ventasRincon.xlsx', (err) => {
-        if (err) throw err;
-        // Eliminar el archivo después de enviarlo
-        fs.unlinkSync(excelFilePath)
-      })
-    })
+    SELECT c.id AS id_compra, c.fecha_compra, c.total, p.nombre AS nombre_producto, p.precio AS precio_producto, dc.cantidad_comprada
+    FROM compras c
+    JOIN detalles_compra dc ON c.id = dc.id_compra
+    JOIN productos p ON dc.id_producto = p.id
+  `
+  connection.query(query, (err, results) => {
+        if (err) throw err
+            // Crear un workbook y worksheet
+            const workbook = XLSX.utils.book_new()
+            const worksheet = XLSX.utils.json_to_sheet(results)
+            // Agregar el worksheet al workbook
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Ventas')
+            // Guardar el archivo Excel
+            const excelFilePath = 'ventas.xlsx';
+            console.log("Libro creado exitosamente!!!")
+            XLSX.writeFile(workbook, excelFilePath)
+            // Enviar el archivo Excel como respuesta
+            res.download(excelFilePath, 'ventasRincon.xlsx', (err) => {
+            if (err) throw err;
+            // Eliminar el archivo después de enviarlo
+            fs.unlinkSync(excelFilePath)
+            })
+        })
+    } else {
+        console.log("Usuario sin permisos...")
+        res.status(403).send('Acceso no autorizado')
+    }
 })
 
 app.listen(process.env.PORT, () => { // Se inicia el servidor

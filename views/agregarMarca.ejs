@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es">
+<%- include('head') %>
+    <body>
+        <header>
+            <%- include('navbar') %>
+        </header>
+        <div class="container">
+            <h1 class="titulo">Agregar Marca</h1>
+            <form action="/marcas/agregar" method="POST" class="formulario">
+                <!-- Precio -->
+                <label for="precio">Nueva Categoria:</label>
+                <input type="text" id="marca" name="marca" value="" class="form-control">
+                <!-- Botón para modificar -->
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Modificar</button>
+            </form>
+        </div>
+        <%- include('footer', { currentYear: new Date().getFullYear() }) %>
+    </body>
+</html>

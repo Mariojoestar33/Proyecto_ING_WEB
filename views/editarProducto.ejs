@@ -27,35 +27,26 @@
             <input type="number" id="precio" name="precio" value="<%= product.precio %>">
 
             <!-- Marca (modificado similar al tipo de usuario) -->
-            <% if (tipo == 'administrador') { %>
-                <label for="marca">Marca:</label>
-                <select id="marca" name="marca">
-                    <option value="Barrilito" <%= product.marca === 'Barrilito' ? 'selected' : '' %>>Barrilito</option>
-                    <option value="Bond" <%= product.marca === 'Bond' ? 'selected' : '' %>>Bond</option>
-                    <option value="Borax" <%= product.marca === 'Borax' ? 'selected' : '' %>>Borax</option>
-                    <option value="Norma" <%= product.marca === 'Norma' ? 'selected' : '' %>>Norma</option>
-                    <option value="Paper Mate" <%= product.marca === 'Paper Mate' ? 'selected' : '' %>>Paper Mate</option>
-                    <option value="Scribe" <%= product.marca === 'Scribe' ? 'selected' : '' %>>Scribe</option>
+            <div class="form-group">
+                <label for="marca" class="subtext">Marca:</label>
+                <select id="marca" name="marca" class="form-control">
+                    <option value="">Seleccionar marca existente</option>
+                    <% marcas.forEach(function(marca) { %>
+                        <option value="<%= marca.nombre %>" <%= product.marca === marca.nombre ? 'selected' : '' %>><%= marca.nombre %></option>
+                    <% }); %>
                 </select>
-            <% } else { %>
-                <p>Marca: Admin Only Brand (No se puede modificar)</p>
-                <input type="hidden" name="marca" value="<%= product.marca %>">
-            <% } %>
+            </div>
 
             <!-- Categoría (añadida similar al tipo de usuario) -->
-            <% if (tipo == 'administrador') { %>
-                <label for="categoria">Categoría:</label>
-                <select id="categoria" name="categoria">
-                    <option value="Adhesivos" <%= product.categoria === 'Adhesivos' ? 'selected' : '' %>>Adhesivos</option>
-                    <option value="Escritura" <%= product.categoria === 'Escritura' ? 'selected' : '' %>>Escritura</option>
-                    <option value="Herramientas" <%= product.categoria === 'Herramientas' ? 'selected' : '' %>>Herramientas</option>
-                    <option value="Papel" <%= product.categoria === 'Papel' ? 'selected' : '' %>>Papel</option>
-                    <!-- Agrega más opciones según tus necesidades -->
+            <div class="form-group">
+                <label for="categoria" class="subtext">Categoria:</label>
+                <select id="categoria" name="categoria" class="form-control">
+                    <option value="">Seleccionar categoria existente</option>
+                    <% categorias.forEach(function(categoria) { %>
+                        <option value="<%= categoria.nombre %>" <%= product.categoria === categoria.nombre ? 'selected' : '' %>><%= categoria.nombre %></option>
+                    <% }) %>
                 </select>
-            <% } else { %>
-                <p>Categoría: Admin Only Category (No se puede modificar)</p>
-                <input type="hidden" name="categoria" value="<%= product.categoria %>">
-            <% } %>
+            </div>
 
             <!-- Botón para modificar -->
             <button type="submit" class="btn btn-warning" style="width: 100%;">Modificar</button>
