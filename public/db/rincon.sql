@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.1.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 07-11-2023 a las 19:41:28
--- Versión del servidor: 5.7.36
--- Versión de PHP: 7.4.26
+-- Tiempo de generación: 11-12-2023 a las 02:01:37
+-- Versión del servidor: 8.0.31
+-- Versión de PHP: 8.0.26
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -29,22 +29,47 @@ SET time_zone = "+00:00";
 
 DROP TABLE IF EXISTS `carrito`;
 CREATE TABLE IF NOT EXISTS `carrito` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `id_usuario` int(11) NOT NULL,
-  `id_producto` int(11) NOT NULL,
-  `cantidad` int(11) NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id_usuario` int NOT NULL,
+  `id_producto` int NOT NULL,
+  `cantidad` int NOT NULL,
   `fecha_creacion` timestamp NOT NULL,
   PRIMARY KEY (`id`),
   KEY `id_usuario` (`id_usuario`),
   KEY `id_producto` (`id_producto`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `carrito`
 --
 
 INSERT INTO `carrito` (`id`, `id_usuario`, `id_producto`, `cantidad`, `fecha_creacion`) VALUES
-(1, 21, 1, 16, '2023-11-06 19:42:06');
+(1, 21, 1, 16, '2023-11-07 01:42:06');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `categorias`
+--
+
+DROP TABLE IF EXISTS `categorias`;
+CREATE TABLE IF NOT EXISTS `categorias` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(64) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `nombre` (`nombre`)
+) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Volcado de datos para la tabla `categorias`
+--
+
+INSERT INTO `categorias` (`id`, `nombre`) VALUES
+(1, 'Papel'),
+(2, 'Escritura'),
+(3, 'Adhesivos'),
+(4, 'Herramientas'),
+(8, 'Manualidades');
 
 -- --------------------------------------------------------
 
@@ -54,15 +79,15 @@ INSERT INTO `carrito` (`id`, `id_usuario`, `id_producto`, `cantidad`, `fecha_cre
 
 DROP TABLE IF EXISTS `compras`;
 CREATE TABLE IF NOT EXISTS `compras` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `id_usuario` int(11) DEFAULT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id_usuario` int DEFAULT NULL,
   `fecha_compra` date DEFAULT NULL,
   `total` decimal(10,2) DEFAULT NULL,
-  `id_direccion` int(11) DEFAULT NULL,
+  `id_direccion` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_usuario` (`id_usuario`),
   KEY `fk_compras_direccion` (`id_direccion`)
-) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `compras`
@@ -80,14 +105,14 @@ INSERT INTO `compras` (`id`, `id_usuario`, `fecha_compra`, `total`, `id_direccio
 
 DROP TABLE IF EXISTS `detalles_compra`;
 CREATE TABLE IF NOT EXISTS `detalles_compra` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `id_compra` int(11) DEFAULT NULL,
-  `id_producto` int(11) DEFAULT NULL,
-  `cantidad_comprada` int(11) DEFAULT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id_compra` int DEFAULT NULL,
+  `id_producto` int DEFAULT NULL,
+  `cantidad_comprada` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_compra` (`id_compra`),
   KEY `id_producto` (`id_producto`)
-) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `detalles_compra`
@@ -106,8 +131,8 @@ INSERT INTO `detalles_compra` (`id`, `id_compra`, `id_producto`, `cantidad_compr
 
 DROP TABLE IF EXISTS `direcciones`;
 CREATE TABLE IF NOT EXISTS `direcciones` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `id_usuario` int(11) DEFAULT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id_usuario` int DEFAULT NULL,
   `calle` varchar(64) DEFAULT NULL,
   `numero_exterior` varchar(10) DEFAULT NULL,
   `ciudad` varchar(64) DEFAULT NULL,
@@ -115,7 +140,7 @@ CREATE TABLE IF NOT EXISTS `direcciones` (
   `colonia` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_usuario` (`id_usuario`)
-) ENGINE=MyISAM AUTO_INCREMENT=20 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `direcciones`
@@ -143,21 +168,49 @@ INSERT INTO `direcciones` (`id`, `id_usuario`, `calle`, `numero_exterior`, `ciud
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `marcas`
+--
+
+DROP TABLE IF EXISTS `marcas`;
+CREATE TABLE IF NOT EXISTS `marcas` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(64) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `nombre` (`nombre`)
+) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Volcado de datos para la tabla `marcas`
+--
+
+INSERT INTO `marcas` (`id`, `nombre`) VALUES
+(1, 'Scribe'),
+(2, 'Barril'),
+(3, 'Paper Mate'),
+(4, 'Bond'),
+(5, 'Barol'),
+(6, 'Barrilito'),
+(7, 'Borax'),
+(8, 'Norma');
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `productos`
 --
 
 DROP TABLE IF EXISTS `productos`;
 CREATE TABLE IF NOT EXISTS `productos` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(64) DEFAULT NULL,
   `categoria` varchar(64) DEFAULT NULL,
-  `stock` int(11) DEFAULT NULL,
+  `stock` int DEFAULT NULL,
   `descripcion` varchar(64) DEFAULT NULL,
   `imagen` varchar(255) DEFAULT NULL,
   `precio` decimal(10,2) DEFAULT NULL,
   `marca` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=21 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `productos`
@@ -178,10 +231,10 @@ INSERT INTO `productos` (`id`, `nombre`, `categoria`, `stock`, `descripcion`, `i
 (12, 'Papel bond 2', 'Papel', 90, 'Papel bond amarillo', 'images/papel/bond_2.jpg', '15.00', 'Bond'),
 (13, 'Bloc de notas 2', 'Papel', 70, 'Block de notas de 50 hojas cuadro grande.', 'images/papel/block_2.jpg', '67.00', 'Norma'),
 (14, 'Bolígrafo 2', 'Escritura', 167, 'Bolígrafo negro de 0.04mm.', 'images/escritura/boligrafo_2.jpg', '6.50', 'Paper Mate'),
-(15, 'Lápiz 2', 'Escritura', 140, 'Lápiz de color rojo.', 'images/escritura/lapiz_2.jpg', '5.00', 'Scribe'),
+(15, 'Lápiz 2', 'Escritura', 140, 'Lápices de carbón', 'images/escritura/lapiz_2.jpg', '5.00', 'Scribe'),
 (19, 'Papel día de Muertos', 'Papel', 100, 'Papel mache con temática de día de muertos.', 'images/Papel/papel-día-de-muertos.jpg', '45.00', 'Norma'),
 (20, 'Libreta forma francesa', 'Papel', 20, 'Libreta Scribbe con forma francesa y rayas de 100 hojas.', 'images/Papel/libreta-forma-francesa.jpg', '98.00', 'Scribe'),
-(18, 'Tijeras 3', 'Herramientas', 2, 'Si', 'images/Herramientas/tijeras-3.jpg', '24.00', 'Borax');
+(18, 'Tijeras 3', 'Herramientas', 2, 'Tijeras nuevas de cocodrilo.', 'images/Herramientas/tijeras-3.jpg', '24.00', 'Borax');
 
 -- --------------------------------------------------------
 
@@ -191,7 +244,7 @@ INSERT INTO `productos` (`id`, `nombre`, `categoria`, `stock`, `descripcion`, `i
 
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(64) DEFAULT NULL,
   `correo` varchar(64) DEFAULT NULL,
   `tipo` enum('administrador','editor','cliente') DEFAULT NULL,
@@ -199,7 +252,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `salt` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `correo` (`correo`)
-) ENGINE=MyISAM AUTO_INCREMENT=29 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `users`
@@ -208,7 +261,8 @@ CREATE TABLE IF NOT EXISTS `users` (
 INSERT INTO `users` (`id`, `nombre`, `correo`, `tipo`, `contrasenia`, `salt`) VALUES
 (19, 'Mariano Peña Romero', 'mariano.pena15@gmail.com', 'administrador', '1070782220a60f7d5d3177114e400c52eba418260734f38c117d7a6415ef6e0c', '2ba1e14c0e9bbf77d7447881371cb1a4'),
 (21, 'Tania', 'tann07lee04@gmail.com', 'cliente', '0e2d7e5008063fe7edd958f19ecee9e5a7031acc7093a0340a5ebbb3617fd0fa', 'e223246e25b04a8b402884c4f19645ac'),
-(26, 'Jorge Ramirez Lopez', 'antonio33@gmail.com', 'editor', '5a3a1c2408cd199f8c32994f35091c142194cb3ed4f36ee44409be10846f653b', '467be222a31c5bd1d39d7f240632883a');
+(26, 'Jorge Ramirez Lopez', 'antonio33@gmail.com', 'editor', '5a3a1c2408cd199f8c32994f35091c142194cb3ed4f36ee44409be10846f653b', '467be222a31c5bd1d39d7f240632883a'),
+(27, 'Mariojoestar', 'onairam15@hotmail.com', 'cliente', '93e4c7bc4981e333049c190b2d33b72a6f78de53414e112679ebe9a950e2709e', '1ae56fecd33d77fc9223fc2e94501012');
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
