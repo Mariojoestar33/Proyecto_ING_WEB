@@ -977,7 +977,8 @@ app.post('/productos/agregar', upload.single('imagen'), (req, res) => {
                 let categoriaProducto = categoria || nueva_categoria
                 categoriaProducto = categoriaProducto.toLowerCase()
                 const nombreProducto = nombre.toLowerCase().replace(/\s+/g, '-')// Convierte espacios en guiones
-                const nuevaRutaImagen = `public/images/${categoriaProducto}/${nombreProducto}-${i}.jpg`
+                const bytesAleatorios = crypto.randomBytes(5).toString('hex')
+                const nuevaRutaImagen = `public/images/${categoriaProducto}/${nombreProducto}-${bytesAleatorios}.jpg`
                 // Renombra y mueve la imagen redimensionada al nuevo directorio
                 if (fs.existsSync(`${imagePath}-resized`)) {
                     fs.renameSync(`${imagePath}-resized`, nuevaRutaImagen)  
@@ -996,7 +997,7 @@ app.post('/productos/agregar', upload.single('imagen'), (req, res) => {
                     }
                     i++
                     console.log("Producto agregado exitosamente!!!")
-                    res.redirect('/productos')
+                    res.redirect('/productosAdmin')
                 })
             })
     } else {
@@ -1008,7 +1009,7 @@ app.post('/productos/agregar', upload.single('imagen'), (req, res) => {
                 res.status(500).send('Error interno del servidor')
                 return
             }
-            res.redirect('/productos')
+            res.redirect('/productosAdmin')
         })
     }
 })
