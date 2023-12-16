@@ -13,6 +13,7 @@ const jwt = require('jsonwebtoken')
 const XLSX = require('xlsx')
 
 const nodemailer = require('nodemailer')
+const { error } = require('console')
 
 let i = 1
 
@@ -1513,6 +1514,81 @@ app.get('/exportar', (req, res) => {
     } else {
         console.log("Usuario sin permisos...")
         res.status(403).send('Acceso no autorizado')
+    }
+})
+
+//Ruta para poder editar las rutas en el sistema
+app.get('/marcas/editar', (req, res) => {
+    res.locals.userRole = userRole
+    if (req.session.usuario && (req.session.usuario.tipo === "editor" || req.session.usuario.tipo === "administrador")) {
+        const queryMarcas = 'SELECT id, nombre FROM marcas'
+        connection.query(queryMarcas, (errMarcas, marcas) => {
+            if (errMarcas) {
+                console.log("Error al obtener la lista de marcas:", errMarcas)
+                res.redirect("/productosAdmin")
+                return
+            }
+            if (marcas.length > 0) {
+                // Por defecto, selecciona la primera marca
+                const selectedMarcaId = req.query.marca || marcas[0].id
+                const queryMarcaActual = 'SELECT id, nombre FROM marcas WHERE id = ?'
+                connection.query(queryMarcaActual, [selectedMarcaId], (errMarcaActual, marcaActual) => {
+                    if (errMarcaActual) {
+                        console.log("Error al obtener la marca actual:", errMarcaActual)
+                        res.redirect("/productosAdmin")
+                        return
+                    }
+
+                    res.render('editarMarca', {
+                        pageTitle: "Editar Marca",
+                        marcas: marcas,
+                        selectedMarcaId: selectedMarcaId,
+                        marcaActual: marcaActual[0],
+                    })
+                })
+            } else {
+                console.log("No se encuentran marcas registradas...")
+                res.redirect("/productosAdmin")
+            }
+        })
+    } else {
+        console.log("El usuario no tiene los permisos necesarios...")
+        res.redirect("/")
+    }
+})
+
+//Metodo para editar marcas en sistema
+app.post('/marcas/editar', (req, res) => {
+    res.locals.userRole = userRole
+    if (req.session.usuario && (req.session.usuario.tipo === "editor" || req.session.usuario.tipo === "administrador")) {
+        const selectedMarcaNombre = req.body.marca
+        const nuevoNombre = req.body.nuevoNombre
+        console.log(selectedMarcaNombre)
+        console.log(nuevoNombre)
+        if (!selectedMarcaNombre || !nuevoNombre) {
+            console.log("Error: Debes seleccionar una marca y proporcionar un nuevo nombre.")
+            res.redirect("/marcas/editar")
+            return;
+        }
+        const updateMarcaQuery = 'UPDATE marcas SET nombre = ? WHERE nombre = ?';
+        connection.query(updateMarcaQuery, [nuevoNombre, selectedMarcaNombre], (err, results) => {
+            if (err) {
+                console.log("Error al actualizar el nombre de la marca:", err)
+            } else {
+                // Ahora, también puedes actualizar el nombre de la marca en los productos asociados.
+                const updateProductosQuery = 'UPDATE productos SET marca = ? WHERE marca = ?';
+                connection.query(updateProductosQuery, [nuevoNombre, selectedMarcaNombre], (errProductos, resultsProductos) => {
+                    if (errProductos) {
+                        console.log("Error al actualizar el nombre de la marca en los productos:", errProductos)
+                    }
+                    console.log("Editado correctamente")
+                    res.redirect("/marcas/editar")
+                })
+            }
+        })
+    } else {
+        console.log("El usuario no tiene los permisos necesarios!!!")
+        res.redirect("/")
     }
 })
 

@@ -55,9 +55,9 @@
                         <td class="col-2"><%= product.marca %></td> <!-- Nueva columna -->
                         <% if (userRole === "administrador") { %>
                             <td class="col-2">
-                                <a href="/productos/<%= product.id %>/editar" class="btn btn-warning btn-sm" id="botonUSUARIO">Editar</a>
+                                <a href="/productos/<%= product.id %>/editar" class="btn btn-warning btn-sm" id="botonUSUARIO"> <img src="/images/edit.svg" alt="editar"> Editar</a>
                                 <form action="/productos/<%= product.id %>/eliminar" method="post" onsubmit="return confirmDelete();">
-                                    <button type="submit" class="btn btn-danger btn-sm" id="botonUSUARIO">Eliminar</button>
+                                    <button type="submit" class="btn btn-danger btn-sm" id="botonUSUARIO"><img src="/images/x.svg" alt=""> Eliminar</button>
                                 </form>
                             </td>
                         <% } else if (userRole === "editor") { %>
@@ -69,7 +69,10 @@
                 <% }); %>
             </tbody>
         </table>
-        <a href="/marcas/agregar" class="btn btn-primary btn-sm mx-auto" style="display: flex; justify-content: center;">Agregar Marca</a>
+        <div class="div-marcas">
+            <a href="/marcas/agregar" class="btn btn-primary btn-sm mx-auto" style="margin-right: 10px;">Agregar Marca</a>
+            <a href="/marcas/editar" class="btn btn-warning btn-sm mx-auto">Editar Marca</a>
+        </div>
         <br>
         <a href="/categorias/agregar" class="btn btn-primary btn-sm mx-auto" style="display: flex; justify-content: center;">Agregar Categoria</a>
         <br>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<%- include('head') %>
+    <body>
+        <header>
+            <%- include('navbar') %>
+        </header>
+        <div class="container">
+            <h1 class="titulo">Editar Marca</h1>
+            <form action="/marcas/editar" method="POST" class="formulario">
+                <label for="marca">Seleccione una Marca:</label>
+                <select id="marca" name="marca">
+                    <% marcas.forEach(marca => { %>
+                        <option value="<%= marca.nombre %>"><%= marca.nombre %></option>
+                    <% }); %>
+                </select>
+                <!-- Nuevo nombre de la marca -->
+                <label for="nuevoNombre">Nuevo Nombre:</label>
+                <input type="text" id="nuevoNombre" name="nuevoNombre">
+
+                <!-- Botón para modificar -->
+                <button type="submit" class="btn btn-warning" style="width: 100%;">Modificar</button>
+            </form>
+        </div>
+        <%- include('footer', { currentYear: new Date().getFullYear() }) %>
+    </body>
+</html>

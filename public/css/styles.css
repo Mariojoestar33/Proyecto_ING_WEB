@@ -498,5 +498,11 @@ footer {
 }
 
 #botonUSUARIO {
-    width: 70px;
+    width: 90px;
+}
+
+.div-marcas {
+    display: flex; 
+    flex-direction: row; 
+    justify-content: center;
 }
