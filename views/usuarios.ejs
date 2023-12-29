@@ -24,10 +24,10 @@
                                 <td class="col-4"><%= user.nombre %></td>
                                 <td class="col-4"><%= user.correo %></td>
                                 <td class="col-4">
-                                    <a href="/usuarios/<%= user.id %>/editar" class="btn btn-warning btn-sm" id="botonUSUARIO">Editar</a>
+                                    <a href="/usuarios/<%= user.id %>/editar" class="btn btn-warning btn-sm" id="botonUSUARIO"> <img src="/images/edit.svg" alt="editar"> Editar</a>
                                     <% if(usuario.nombre != user.nombre) { %>
                                         <form action="/usuarios/<%= user.id %>/eliminar" method="post" onsubmit="return confirmDelete();">
-                                            <button type="submit" class="btn btn-danger btn-sm" id="botonUSUARIO">Eliminar</button>
+                                            <button type="submit" class="btn btn-danger btn-sm" id="botonUSUARIO"><img src="/images/x.svg" alt=""> Eliminar</button>
                                         </form>
                                     <% } %>
                                 </td>
@@ -51,10 +51,10 @@
                                 <td class="col-4"><%= user.nombre %></td>
                                 <td class="col-4"><%= user.correo %></td>
                                 <td class="col-4">
-                                    <a href="/usuarios/<%= user.id %>/editar" class="btn btn-warning btn-sm" id="botonUSUARIO">Editar</a>
+                                    <a href="/usuarios/<%= user.id %>/editar" class="btn btn-warning btn-sm" id="botonUSUARIO"><img src="/images/edit.svg" alt="editar">Editar</a>
                                     <% if(usuario.nombre != user.nombre) { %>
                                         <form action="/usuarios/<%= user.id %>/eliminar" method="post" onsubmit="return confirmDelete();">
-                                            <button type="submit" class="btn btn-danger btn-sm" id="botonUSUARIO">Eliminar</button>
+                                            <button type="submit" class="btn btn-danger btn-sm" id="botonUSUARIO"><img src="/images/x.svg" alt="">Eliminar</button>
                                         </form>
                                     <% } %>
                                 </td>
@@ -78,10 +78,10 @@
                                 <td class="col-4"><%= user.nombre %></td>
                                 <td class="col-4"><%= user.correo %></td>
                                 <td class="col-4">
-                                    <a href="/usuarios/<%= user.id %>/editar" class="btn btn-warning btn-sm" id="botonUSUARIO">Editar</a>
+                                    <a href="/usuarios/<%= user.id %>/editar" class="btn btn-warning btn-sm" id="botonUSUARIO"><img src="/images/edit.svg" alt="editar">Editar</a>
                                     <% if(usuario.nombre != user.nombre) { %>
                                         <form action="/usuarios/<%= user.id %>/eliminar" method="post" onsubmit="return confirmDelete();">
-                                            <button type="submit" class="btn btn-danger btn-sm" id="botonUSUARIO">Eliminar</button>
+                                            <button type="submit" class="btn btn-danger btn-sm" id="botonUSUARIO"><img src="/images/x.svg" alt="">Eliminar</button>
                                         </form>
                                     <% } %>
                                 </td>
